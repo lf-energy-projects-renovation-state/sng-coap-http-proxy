@@ -11,16 +11,16 @@ plugins {
     kotlin("jvm") version "1.9.10" apply false
     kotlin("plugin.spring") version "1.9.10" apply false
     kotlin("plugin.jpa") version "1.9.10" apply false
-    id("org.sonarqube") version "4.2.1.3168"
+    id("org.sonarqube") version "4.4.1.3373"
     id("eclipse")
 }
 
 version = System.getenv("GITHUB_REF_NAME")?.replace("/", "-")?.lowercase() ?: "develop"
 
-sonarqube {
+sonar {
     properties {
         property("sonar.host.url", "https://sonarcloud.io")
-        property("sonar.projectKey", "OSGP_sng-coap-http-proxy")
+        property("sonar.projectKey", "OSGP_coap-http-proxy")
         property("sonar.organization", "gxf")
     }
 }
