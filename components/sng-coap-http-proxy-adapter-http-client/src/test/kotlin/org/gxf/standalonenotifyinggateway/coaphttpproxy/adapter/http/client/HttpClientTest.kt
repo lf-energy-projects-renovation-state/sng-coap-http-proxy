@@ -6,6 +6,7 @@ package org.gxf.standalonenotifyinggateway.coaphttpproxy.adapter.http.client
 
 import com.fasterxml.jackson.databind.json.JsonMapper
 import org.assertj.core.api.Assertions.assertThat
+import org.gxf.standalonenotifyinggateway.coaphttpproxy.adapter.http.client.configuration.HttpConfiguration
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.adapter.http.client.configuration.HttpsConfiguration
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.domain.model.message.Message
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.domain.model.message.Payload
@@ -29,7 +30,7 @@ import java.util.concurrent.TimeUnit
 @ActiveProfiles("test")
 @EnableAutoConfiguration
 @SpringJUnitConfig(
-    value = [HttpClient::class, HttpsConfiguration::class],
+    value = [HttpClient::class, HttpConfiguration::class, HttpsConfiguration::class],
     initializers = [ConfigDataApplicationContextInitializer::class]
 )
 @MockServerTest("config.http.port=\${mockServerPort}")
@@ -147,6 +148,6 @@ class HttpClientTest {
             .error(HttpError().withDropConnection(true))
     }
 
-    private fun url() = "https://${httpProps.host}:${httpProps.port}/${httpProps.target}/$TEST_ID"
+    private fun url() = "${if (httpProps.sslEnabled) "https" else "http"}://${httpProps.host}:${httpProps.port}/${httpProps.target}/$TEST_ID"
 
 }

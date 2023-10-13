@@ -28,7 +28,7 @@ class HttpPropertiesTest {
     fun shouldSetConfigurationPropertiesWhenBindingPropertiesFile() {
         // arrange
         val expected = HttpProperties(
-            sslEnabled = true,
+            sslEnabled = false,
             sslBundle = "sngSslBundle",
             host = "localhost",
             port = 8181,

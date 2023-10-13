@@ -8,7 +8,7 @@ config:
     host: "localhost"
     port: 8181
     target: "sng-test"
-    sslEnabled: true
+    sslEnabled: false
     sslBundle: "sngSslBundle"
 
     connectionTimeout: 500ms
