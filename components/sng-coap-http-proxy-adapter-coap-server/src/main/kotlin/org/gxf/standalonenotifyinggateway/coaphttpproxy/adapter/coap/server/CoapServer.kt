@@ -52,8 +52,6 @@ class CoapServer(
         }
     }
 
-    private fun sanitizePath(path: String) = if (path.startsWith("/")) path.substring(1) else path
-
     private fun createSecureEndpoint() =
         CoapEndpoint.Builder()
             .setConfiguration(config)

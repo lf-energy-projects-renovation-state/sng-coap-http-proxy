@@ -67,7 +67,7 @@ class CoapHttpProxyApplicationTests {
 
 
     @Test
-    fun `Test scenario proxy receives valid message`() {
+    fun testScenarioProxyReceivesValidMessage() {
         // given
         givenACoapClient()
         givenTheHttpServerRespondsWith(OK_HTTP_RESPONSE)
@@ -80,7 +80,7 @@ class CoapHttpProxyApplicationTests {
     }
 
     @Test
-    fun `Test scenario proxy receives invalid message`() {
+    fun testScenarioProxyReceivesInvalidMessage() {
         // given
         givenACoapClient()
 
@@ -92,7 +92,7 @@ class CoapHttpProxyApplicationTests {
     }
 
     @Test
-    fun `Test scenario proxy receives valid message, http server responds with error`() {
+    fun testScenarioProxyReceivesValidMessageButHttpServerRespondsWithError() {
         // given
         givenACoapClient()
         givenTheHttpServerRespondsWith(NOT_OK_HTTP_RESPONSE)
@@ -105,7 +105,7 @@ class CoapHttpProxyApplicationTests {
     }
 
     @Test
-    fun `Test scenario proxy receives invalid connection attempt`() {
+    fun testScenarioProxyReceivesInvalidConnectionAttempt() {
         // given
         givenAnInvalidCoapClient()
         givenTheHttpServerRespondsWith(NOT_OK_HTTP_RESPONSE)

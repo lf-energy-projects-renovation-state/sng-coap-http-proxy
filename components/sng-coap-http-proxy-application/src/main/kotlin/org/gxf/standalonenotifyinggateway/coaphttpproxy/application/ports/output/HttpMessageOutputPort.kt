@@ -7,6 +7,6 @@ package org.gxf.standalonenotifyinggateway.coaphttpproxy.application.ports.outpu
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.domain.model.message.Message
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.domain.model.response.Response
 
-interface HttpMessageOutputPort {
+fun interface HttpMessageOutputPort {
 	fun post(message: Message): Response
 }

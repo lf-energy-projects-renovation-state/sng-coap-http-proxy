@@ -6,6 +6,6 @@ package org.gxf.standalonenotifyinggateway.coaphttpproxy.application.ports.outpu
 
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.domain.model.psk.Psk
 
-interface PskRepositoryOutputPort {
+fun interface PskRepositoryOutputPort {
     fun retrieveAll(): List<Psk>
 }

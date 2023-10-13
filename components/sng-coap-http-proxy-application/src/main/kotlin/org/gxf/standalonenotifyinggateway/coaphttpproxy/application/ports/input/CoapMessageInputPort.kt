@@ -7,6 +7,6 @@ package org.gxf.standalonenotifyinggateway.coaphttpproxy.application.ports.input
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.domain.model.message.Message
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.domain.model.response.Response
 
-interface CoapMessageInputPort {
+fun interface CoapMessageInputPort {
     fun handlePost(message: Message): Response
 }
