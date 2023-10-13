@@ -10,7 +10,7 @@ object MessageValidationService {
 
     fun isValid(message: Message) = checkIDs(message)
 
-    private fun checkIDs(message: Message) = message.deviceId.equals(idFromPayload(message))
+    private fun checkIDs(message: Message) = message.deviceId == idFromPayload(message)
 
     private fun idFromPayload(message: Message) = message.payload.jsonNode.findValue("ID").asText()
 }
