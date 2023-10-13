@@ -11,7 +11,6 @@ plugins {
     kotlin("jvm") version "1.9.10" apply false
     kotlin("plugin.spring") version "1.9.10" apply false
     kotlin("plugin.jpa") version "1.9.10" apply false
-    id("com.github.davidmc24.gradle.plugin.avro") version "1.8.0" apply false
     id("org.sonarqube") version "4.2.1.3168"
     id("eclipse")
 }
@@ -21,11 +20,17 @@ version = System.getenv("GITHUB_REF_NAME")?.replace("/", "-")?.lowercase() ?: "d
 sonarqube {
     properties {
         property("sonar.host.url", "https://sonarcloud.io")
-        property("sonar.projectKey", "OSGP_gxf-service-template")
+        property("sonar.projectKey", "OSGP_sng-coap-http-proxy")
         property("sonar.organization", "gxf")
     }
 }
 tasks.sonar
+
+extra["archUnitVersion"] = "1.1.0"
+extra["californiumVersion"] = "3.8.0"
+extra["kotlinLoggingJvmVersion"] = "3.0.5"
+extra["mockitoKotlinVersion"] = "5.1.0"
+extra["mockServerVersion"] = "5.15.0"
 
 subprojects {
     apply(plugin = "org.jetbrains.kotlin.jvm")
@@ -34,7 +39,7 @@ subprojects {
     apply(plugin = "eclipse")
     apply(plugin = "org.jetbrains.kotlin.plugin.jpa")
 
-    group = "org.gxf.template"
+    group = "org.gxf.standalonenotifyinggateway"
     version = rootProject.version
 
     repositories {

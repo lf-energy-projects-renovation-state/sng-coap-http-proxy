@@ -1,0 +1,47 @@
+#SPDX-FileCopyrightText: Contributors to the GXF project
+#
+#SPDX-License-Identifier: Apache-2.0
+
+config:
+  # CoAP configuration used by the coap server
+  coap:
+    coapPort: 55683
+    coapsPort: 55684
+    coapsEnabled: false
+    path: "test"
+
+    deduplicator: NO_DEDUPLICATOR
+    maxActivePeers: 20001
+    maxMessageSize: 1025
+    maxPeerInactivityPeriod: 25h
+    maxResourceBodySize: 8193
+    preferredBlockSize: 1026
+
+  # HTTP configuration used by the http client
+  http:
+    host: "localhost"
+    port: 8181
+    target: "sng-test"
+    sslEnabled: true
+    sslBundle: "sngSslBundle"
+
+    connectionTimeout: 500ms
+    responseTimeout: 500ms
+
+  # UDP configuration used by the coap server
+  udp:
+    udpReceiveBufferSize: 8193
+    udpSendBufferSize: 8194
+    healthStatusInterval: 61s
+
+spring:
+  # Spring SSL bundle used by the http client
+  ssl:
+    bundle:
+      jks:
+        sngSslBundle:
+          truststore:
+            location: "classpath:ssl/truststore.jks"
+            password: "123456"
+            type: "PKCS12"
+

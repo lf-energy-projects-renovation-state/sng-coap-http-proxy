@@ -8,17 +8,23 @@ plugins {
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
-    implementation("org.springframework.boot:spring-boot-starter-web")
-
-    implementation(project(":components:kafka"))
-    implementation(project(":components:mqtt"))
 
     runtimeOnly("io.micrometer:micrometer-registry-prometheus")
-    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+
+    // Stand-alone notifying gateway components
+    api(project(":components:sng-coap-http-proxy-domain"))
+    api(project(":components:sng-coap-http-proxy-application"))
+    api(project(":components:sng-coap-http-proxy-adapter-coap-server"))
+    api(project(":components:sng-coap-http-proxy-adapter-http-client"))
+    api(project(":components:sng-coap-http-proxy-adapter-psk-stub"))
+
+    // Test dependencies
+    testImplementation("com.tngtech.archunit:archunit:${rootProject.extra["archUnitVersion"]}")
+    testImplementation("com.tngtech.archunit:archunit-junit5:${rootProject.extra["archUnitVersion"]}")
 }
 
 tasks.withType<org.springframework.boot.gradle.tasks.bundling.BootBuildImage> {
-    imageName.set("ghcr.io/osgp/gxf-service-template:${version}")
+    imageName.set("ghcr.io/osgp/sng-coap-http-proxy:${version}")
     if (project.hasProperty("publishImage")) {
         publish.set(true)
         docker {
@@ -37,8 +43,12 @@ testing {
             dependencies {
                 implementation(project())
                 implementation("org.springframework.boot:spring-boot-starter-test")
-                implementation("org.springframework.kafka:spring-kafka-test")
-                implementation("org.testcontainers:kafka:1.17.6")
+                implementation("org.mock-server:mockserver-spring-test-listener:${rootProject.extra["mockServerVersion"]}")
+                implementation("org.eclipse.californium:californium-core:${rootProject.extra["californiumVersion"]}")
+                implementation("org.eclipse.californium:scandium:${rootProject.extra["californiumVersion"]}")
+                implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-cbor")
+                implementation("io.github.microutils:kotlin-logging-jvm:${rootProject.extra["kotlinLoggingJvmVersion"]}")
+                implementation(project(":components:sng-coap-http-proxy-adapter-coap-test-client"))
             }
         }
     }

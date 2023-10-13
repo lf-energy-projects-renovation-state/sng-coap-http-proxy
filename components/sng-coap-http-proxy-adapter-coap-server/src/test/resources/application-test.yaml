@@ -1,0 +1,22 @@
+#SPDX-FileCopyrightText: Contributors to the GXF project
+#
+#SPDX-License-Identifier: Apache-2.0
+
+config:
+  # CoAP configuration used by the coap server
+  coap:
+    coapsPort: 55684
+    path: "sng-test"
+
+    deduplicator: NO_DEDUPLICATOR
+    maxActivePeers: 20001
+    maxMessageSize: 1025
+    maxPeerInactivityPeriod: 25h
+    maxResourceBodySize: 8193
+    preferredBlockSize: 1026
+
+  # UDP configuration used by the coap server
+  udp:
+    udpReceiveBufferSize: 8193
+    udpSendBufferSize: 8194
+    healthStatusInterval: 61s

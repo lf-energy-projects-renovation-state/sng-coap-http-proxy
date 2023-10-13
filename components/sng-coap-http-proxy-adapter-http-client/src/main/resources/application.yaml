@@ -1,0 +1,23 @@
+#SPDX-FileCopyrightText: Contributors to the GXF project
+#
+#SPDX-License-Identifier: Apache-2.0
+
+config:
+  http:
+    host: "localhost"
+    port: 8080
+    target: "sng"
+    sslEnabled: true
+    sslBundle: "sngSslBundle"
+    connectionTimeout: 5000ms
+    responseTimeout: 5000ms
+
+spring:
+  ssl:
+    bundle:
+      jks:
+        sngSslBundle:
+          truststore:
+            location: "classpath:ssl/truststore.jks"
+            password: "123456"
+            type: "PKCS12"
