@@ -8,15 +8,17 @@ plugins {
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-webflux")
 
     runtimeOnly("io.micrometer:micrometer-registry-prometheus")
 
-    // Stand-alone notifying gateway components
-    api(project(":components:sng-coap-http-proxy-domain"))
-    api(project(":components:sng-coap-http-proxy-application"))
-    api(project(":components:sng-coap-http-proxy-adapter-coap-server"))
-    api(project(":components:sng-coap-http-proxy-adapter-http-client"))
-    api(project(":components:sng-coap-http-proxy-adapter-psk-stub"))
+    implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
+    implementation(kotlin("reflect"))
+
+    implementation("org.eclipse.californium:californium-core:${rootProject.extra["californiumVersion"]}")
+    implementation("org.eclipse.californium:scandium:${rootProject.extra["californiumVersion"]}")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-cbor")
 
     // Test dependencies
     testImplementation("com.tngtech.archunit:archunit:${rootProject.extra["archUnitVersion"]}")

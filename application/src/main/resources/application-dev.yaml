@@ -26,9 +26,9 @@ config:
 
   http:
     host: "localhost"
-    port: 8180
+    port: 8080
     target: "sng"
-    sslEnabled: false
+    sslEnabled: true
     sslBundle: "sngSslBundle"
 
     connectionTimeout: 5000ms
@@ -39,7 +39,6 @@ config:
     udpSendBufferSize: 8192
     healthStatusInterval: 60
     healthStatusIntervalUnit: SECONDS
-
 
 logging:
   level:

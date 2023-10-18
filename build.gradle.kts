@@ -20,7 +20,7 @@ version = System.getenv("GITHUB_REF_NAME")?.replace("/", "-")?.lowercase() ?: "d
 sonar {
     properties {
         property("sonar.host.url", "https://sonarcloud.io")
-        property("sonar.projectKey", "OSGP_coap-http-proxy")
+        property("sonar.projectKey", "OSGP_sng-coap-http-proxy")
         property("sonar.organization", "gxf")
     }
 }
