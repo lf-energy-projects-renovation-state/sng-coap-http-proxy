@@ -46,7 +46,7 @@ class CoapMessageHandlerTest {
         Mockito.`when`(messageValidator.isValid(message)).thenReturn(true)
 
         coapMessageHandler.handlePost(message)
-        
+
         Mockito.verify(httpClient).post(message)
     }
 }
