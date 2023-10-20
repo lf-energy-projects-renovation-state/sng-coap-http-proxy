@@ -8,7 +8,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 import java.time.Duration
 
 @ConfigurationProperties(prefix = "config.udp")
-data class UdpProperties(
+class UdpProperties(
         val udpReceiveBufferSize: Int,
         val udpSendBufferSize: Int,
         val healthStatusInterval: Duration

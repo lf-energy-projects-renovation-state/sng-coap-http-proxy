@@ -1,63 +1,8 @@
 #SPDX-FileCopyrightText: Contributors to the GXF project
 #
 #SPDX-License-Identifier: Apache-2.0
-
-server:
-  port: 8181
-
 management:
   endpoints:
     web:
       exposure:
-        include: prometheus
-
-config:
-  coap:
-    # coapsPort: 5684
-    coapsPort: 55684
-    path: "sng"
-
-    deduplicator: NO_DEDUPLICATOR
-    maxActivePeers: 20000
-    maxMessageSize: 1024
-    maxPeerInactivityPeriod: 24h
-    maxResourceBodySize: 8192
-    preferredBlockSize: 1024
-
-  http:
-    host: "localhost"
-    port: 8180
-    target: "sng"
-    sslEnabled: false
-    sslBundle: "sngSslBundle"
-
-    connectionTimeout: 5000ms
-    responseTimeout: 5000ms
-
-  udp:
-    udpReceiveBufferSize: 8192
-    udpSendBufferSize: 8192
-    healthStatusInterval: 60
-    healthStatusIntervalUnit: SECONDS
-
-
-logging:
-  level:
-    root: error
-    org.gxf: info
-    org.eclipse.californium: warn
-  file:
-    name: logs/sng-coap-http-proxy.log
-  logback:
-    rollingpolicy:
-      max-history: 30
-
-spring:
-  ssl:
-    bundle:
-      jks:
-        sngSslBundle:
-          truststore:
-            location: "classpath:ssl/truststore.jks"
-            password: "123456"
-            type: "PKCS12"
+        include: "prometheus"

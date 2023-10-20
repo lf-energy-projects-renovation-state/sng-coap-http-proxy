@@ -2,15 +2,6 @@
 #
 #SPDX-License-Identifier: Apache-2.0
 
-server:
-  port: 8181
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: prometheus
-
 config:
   coap:
     coaps-port: 55684
@@ -20,11 +11,11 @@ config:
     max-active-peers: 20000
     max-message-size: 1024
     max-peer-inactivity-period: 24h
-    maxr-esource-body-size: 8192
+    max-resource-body-size: 8192
     preferred-block-size: 1024
 
   http:
-    url: "localhost:9000/sng"
+    url: "localhost:9000/sng-test"
     protocol: "http"
     ssl-bundle: "sngSslBundle"
 
@@ -40,17 +31,6 @@ config:
   psk:
     default-id: "867787050253370"
     default-key: "ABCDEFGHIJKLMNOP"
-
-logging:
-  level:
-    root: error
-    org.gxf: debug
-    org.eclipse.californium: warn
-  file:
-    name: logs/sng-coap-http-proxy.log
-  logback:
-    rollingpolicy:
-      max-history: 30
 
 spring:
   ssl:

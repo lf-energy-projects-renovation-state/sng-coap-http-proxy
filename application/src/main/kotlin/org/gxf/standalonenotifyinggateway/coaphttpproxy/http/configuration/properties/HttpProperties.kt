@@ -9,11 +9,9 @@ import java.time.Duration
 
 @ConfigurationProperties(prefix = "config.http")
 data class HttpProperties(
-    val sslEnabled: Boolean,
-    val sslBundle: String,
-    val host: String,
-    val port: Int,
-    val target: String,
-    val connectionTimeout: Duration,
-    val responseTimeout: Duration
+        val url: String,
+        val protocol: String,
+        val sslBundle: String,
+        val connectionTimeout: Duration,
+        val responseTimeout: Duration
 )

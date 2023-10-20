@@ -13,21 +13,20 @@ import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 
 @Service
-class CoapMessageHandler(private val httpClient: HttpClient) {
+class CoapMessageHandler(private val httpClient: HttpClient, private val messageValidator: MessageValidator) {
 
     private val logger = KotlinLogging.logger {}
 
-    fun handlePost(message: Message): ResponseEntity<String> {
+    fun handlePost(message: Message): ResponseEntity<String>? {
         logger.debug { "Handling post, for message: $message." }
 
-        if (!MessageValidator.isValid(message)) {
-            logger.warn { "Received invalid message: $message" }
-            throw InvalidMessageException("Received invalid message: $message")
+        if (messageValidator.isValid(message)) {
+            val response = httpClient.post(message)
+            logger.debug { "Handled post, got response: $response." }
+            return response
         }
 
-        val response = httpClient.post(message)
-        logger.debug { "Handled post, got response: $response." }
-        return response
+        logger.warn { "Received invalid message: $message" }
+        throw InvalidMessageException("Received invalid message: $message")
     }
-
 }

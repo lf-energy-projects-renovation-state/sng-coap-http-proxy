@@ -24,38 +24,30 @@ class CoapServer(
         private val pskStore: AdvancedPskStore
 ) {
 
-    companion object {
-        private val LOGGER = KotlinLogging.logger { }
-    }
+    private val logger = KotlinLogging.logger { }
 
     private val californiumCoapServer = CaliforniumCoapServer(config)
 
     init {
         with(californiumCoapServer) {
-            LOGGER.info { "Starting CoAP server." }
+            logger.info { "Starting CoAP server." }
 
-            LOGGER.info { "Configuring secure endpoint on port ${coapProps.coapsPort}" }
-            addEndpoint(createSecureEndpoint())
+            logger.info { "Configuring secure endpoint on port ${coapProps.coapsPort}" }
 
+            addEndpoint(createEndpoint())
             add(coapResource)
             start()
 
-            LOGGER.info { "Started CoAP server." }
+            logger.info { "Started CoAP server." }
         }
     }
 
-    fun shutDown() {
-        with(californiumCoapServer) {
-            stop()
-            destroy()
-        }
-    }
-
-    private fun createSecureEndpoint() =
+    private fun createEndpoint() =
             CoapEndpoint.Builder()
                     .setConfiguration(config)
                     .setConnector(createDtlsConnector())
                     .build()
+
 
     private fun createDtlsConnector() = DTLSConnector(
             DtlsConnectorConfig

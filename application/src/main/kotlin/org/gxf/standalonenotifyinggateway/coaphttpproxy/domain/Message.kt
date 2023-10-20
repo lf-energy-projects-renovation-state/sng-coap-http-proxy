@@ -8,5 +8,5 @@ import com.fasterxml.jackson.databind.JsonNode
 
 class Message(val deviceId: String, val payload: JsonNode) {
 
-    override fun toString() = "Message[ deviceId=\"$deviceId\", payload=\"${payload.toString()}\" ]"
+    override fun toString() = "Message[ deviceId=\"$deviceId\", payload=\"${payload}\" ]"
 }

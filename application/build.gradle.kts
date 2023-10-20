@@ -20,9 +20,9 @@ dependencies {
     implementation("org.eclipse.californium:scandium:${rootProject.extra["californiumVersion"]}")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-cbor")
 
-    // Test dependencies
-    testImplementation("com.tngtech.archunit:archunit:${rootProject.extra["archUnitVersion"]}")
-    testImplementation("com.tngtech.archunit:archunit-junit5:${rootProject.extra["archUnitVersion"]}")
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("org.mockito:mockito-junit-jupiter")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:5.1.0")
 }
 
 tasks.withType<org.springframework.boot.gradle.tasks.bundling.BootBuildImage> {
@@ -44,13 +44,13 @@ testing {
             useJUnitJupiter()
             dependencies {
                 implementation(project())
+                implementation("org.wiremock:wiremock:3.2.0")
                 implementation("org.springframework.boot:spring-boot-starter-test")
                 implementation("org.mock-server:mockserver-spring-test-listener:${rootProject.extra["mockServerVersion"]}")
                 implementation("org.eclipse.californium:californium-core:${rootProject.extra["californiumVersion"]}")
                 implementation("org.eclipse.californium:scandium:${rootProject.extra["californiumVersion"]}")
                 implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-cbor")
                 implementation("io.github.microutils:kotlin-logging-jvm:${rootProject.extra["kotlinLoggingJvmVersion"]}")
-                implementation(project(":components:sng-coap-http-proxy-adapter-coap-test-client"))
             }
         }
     }

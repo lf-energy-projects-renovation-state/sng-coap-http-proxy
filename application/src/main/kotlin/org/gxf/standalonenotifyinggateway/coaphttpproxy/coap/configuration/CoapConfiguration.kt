@@ -34,55 +34,49 @@ class CoapConfiguration(private val coapProps: CoapProperties, private val udpPr
     }
 
     @Bean
-    fun pskStore(pskRepository: PskStoreStub) = AdvancedMultiPskStore()
+    fun pskStore(pskStoreStub: PskStoreStub) = AdvancedMultiPskStore()
             .apply {
-                pskRepository.retrieveAll().forEach { psk -> this.setKey(psk.id, psk.key.toByteArray()) }
+                pskStoreStub.retrieveAll().forEach { psk -> this.setKey(psk.id, psk.key.toByteArray()) }
             }
 
     @Bean
-    fun serverConfiguration() =
+    fun serverConfiguration(): CaliforniumConfiguration =
             CaliforniumConfiguration.getStandard()
                     .apply {
                         updateCoapConfigFromProperties(this)
                         updateUdpConfigFromProperties(this)
-                        updateDtlsConfigFromProperties(this)
+                        updateDtlsConfig(this)
                     }
 
     fun updateCoapConfigFromProperties(config: CaliforniumConfiguration) {
-        with(config) {
-            set(CoapConfig.MAX_ACTIVE_PEERS, coapProps.maxActivePeers)
-            set(CoapConfig.MAX_RESOURCE_BODY_SIZE, coapProps.maxResourceBodySize)
-            set(CoapConfig.MAX_MESSAGE_SIZE, coapProps.maxMessageSize)
-            set(CoapConfig.PREFERRED_BLOCK_SIZE, coapProps.preferredBlockSize)
-            set(CoapConfig.DEDUPLICATOR, coapProps.deduplicator)
-            set(CoapConfig.COAP_PORT, coapProps.coapsPort)
-            set(
-                    CoapConfig.MAX_PEER_INACTIVITY_PERIOD,
-                    coapProps.maxPeerInactivityPeriod.getSeconds(),
-                    TimeUnit.SECONDS
-            )
-        }
+        config.set(CoapConfig.MAX_ACTIVE_PEERS, coapProps.maxActivePeers)
+                .set(CoapConfig.MAX_RESOURCE_BODY_SIZE, coapProps.maxResourceBodySize)
+                .set(CoapConfig.MAX_MESSAGE_SIZE, coapProps.maxMessageSize)
+                .set(CoapConfig.PREFERRED_BLOCK_SIZE, coapProps.preferredBlockSize)
+                .set(CoapConfig.DEDUPLICATOR, coapProps.deduplicator)
+                .set(CoapConfig.COAP_SECURE_PORT, coapProps.coapsPort)
+                .set(
+                        CoapConfig.MAX_PEER_INACTIVITY_PERIOD,
+                        coapProps.maxPeerInactivityPeriod.seconds,
+                        TimeUnit.SECONDS
+                )
     }
 
     fun updateUdpConfigFromProperties(config: CaliforniumConfiguration) {
-        with(config) {
-            set(UdpConfig.UDP_RECEIVE_BUFFER_SIZE, udpProps.udpReceiveBufferSize);
-            set(UdpConfig.UDP_SEND_BUFFER_SIZE, udpProps.udpSendBufferSize);
-            set(
-                    SystemConfig.HEALTH_STATUS_INTERVAL,
-                    udpProps.healthStatusInterval.getSeconds(),
-                    TimeUnit.SECONDS
-            )
-        }
+        config.set(UdpConfig.UDP_RECEIVE_BUFFER_SIZE, udpProps.udpReceiveBufferSize)
+                .set(UdpConfig.UDP_SEND_BUFFER_SIZE, udpProps.udpSendBufferSize)
+                .set(
+                        SystemConfig.HEALTH_STATUS_INTERVAL,
+                        udpProps.healthStatusInterval.getSeconds(),
+                        TimeUnit.SECONDS
+                )
     }
 
-    fun updateDtlsConfigFromProperties(config: CaliforniumConfiguration) {
-        with(config) {
-            set(DtlsConfig.DTLS_ROLE, DtlsRole.SERVER_ONLY);
-            set(DtlsConfig.DTLS_RECOMMENDED_CIPHER_SUITES_ONLY, false);
-            set(DtlsConfig.DTLS_PRESELECTED_CIPHER_SUITES, listOf(TLS_PSK_WITH_AES_256_CCM_8));
-            set(DtlsConfig.DTLS_CIPHER_SUITES, listOf(TLS_PSK_WITH_AES_256_CCM_8));
-            set(DtlsConfig.DTLS_CLIENT_AUTHENTICATION_MODE, CertificateAuthenticationMode.NONE)
-        }
+    fun updateDtlsConfig(config: CaliforniumConfiguration) {
+        config.set(DtlsConfig.DTLS_ROLE, DtlsRole.SERVER_ONLY)
+                .set(DtlsConfig.DTLS_RECOMMENDED_CIPHER_SUITES_ONLY, false)
+                .set(DtlsConfig.DTLS_PRESELECTED_CIPHER_SUITES, listOf(TLS_PSK_WITH_AES_256_CCM_8))
+                .set(DtlsConfig.DTLS_CIPHER_SUITES, listOf(TLS_PSK_WITH_AES_256_CCM_8))
+                .set(DtlsConfig.DTLS_CLIENT_AUTHENTICATION_MODE, CertificateAuthenticationMode.NONE)
     }
 }

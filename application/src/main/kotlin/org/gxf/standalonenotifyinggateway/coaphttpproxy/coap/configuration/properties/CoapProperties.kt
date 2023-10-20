@@ -8,7 +8,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 import java.time.Duration
 
 @ConfigurationProperties(prefix = "config.coap")
-data class CoapProperties(
+class CoapProperties(
         val coapsPort: Int,
         val path: String,
         val deduplicator: String,

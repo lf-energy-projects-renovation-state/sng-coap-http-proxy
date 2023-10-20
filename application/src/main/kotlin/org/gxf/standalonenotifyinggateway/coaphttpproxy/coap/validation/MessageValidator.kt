@@ -5,12 +5,12 @@
 package org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.validation
 
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.domain.Message
+import org.springframework.stereotype.Service
 
-object MessageValidator {
-
-    fun isValid(message: Message) = checkIDs(message)
-
-    private fun checkIDs(message: Message) = message.deviceId == idFromPayload(message)
-
-    private fun idFromPayload(message: Message) = message.payload.findValue("ID").asText()
+@Service
+class MessageValidator {
+    fun isValid(message: Message): Boolean {
+        val payloadId = message.payload.findValue("ID").asText()
+        return message.deviceId == payloadId
+    }
 }

@@ -1,10 +1,9 @@
 package org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.configuration.psk
 
+import org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.configuration.properties.PskStubProperties
 import org.springframework.stereotype.Component
 
 @Component
-class PskStoreStub {
-
-    fun retrieveAll() = listOf(Psk("867787050253370", "ABCDEFGHIJKLMNOP"))
-
+class PskStoreStub(private val pskStubProperties: PskStubProperties) {
+    fun retrieveAll() = listOf(Psk(pskStubProperties.defaultId, pskStubProperties.defaultKey))
 }
