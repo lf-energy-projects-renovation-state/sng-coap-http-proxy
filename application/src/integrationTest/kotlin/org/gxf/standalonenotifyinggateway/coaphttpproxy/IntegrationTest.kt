@@ -26,9 +26,6 @@ class IntegrationTest {
     @Value("\${config.http.url}")
     private lateinit var url: String
 
-    @Value("\${config.http.protocol}")
-    private lateinit var protocol: String
-
     @Value("\${config.psk.default-id}")
     private lateinit var securityContextId: String
 
@@ -41,7 +38,7 @@ class IntegrationTest {
 
     @BeforeEach
     fun beforeEach() {
-        val url = URL("$protocol://$url")
+        val url = URL(url)
         wiremock = WireMockServer(url.port)
         wiremock.start()
     }

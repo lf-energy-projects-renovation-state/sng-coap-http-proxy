@@ -11,5 +11,5 @@ import java.time.Duration
 class UdpProperties(
         val udpReceiveBufferSize: Int,
         val udpSendBufferSize: Int,
-        val healthStatusInterval: Duration
+        val healthStatusIntervalInSeconds: Duration
 )

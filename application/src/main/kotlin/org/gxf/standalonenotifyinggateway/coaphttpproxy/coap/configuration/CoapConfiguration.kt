@@ -5,25 +5,28 @@
 package org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.configuration
 
 import org.eclipse.californium.core.config.CoapConfig
+import org.eclipse.californium.core.network.CoapEndpoint
 import org.eclipse.californium.elements.config.CertificateAuthenticationMode
 import org.eclipse.californium.elements.config.SystemConfig
 import org.eclipse.californium.elements.config.TcpConfig
 import org.eclipse.californium.elements.config.UdpConfig
+import org.eclipse.californium.scandium.DTLSConnector
+import org.eclipse.californium.scandium.MdcConnectionListener
 import org.eclipse.californium.scandium.config.DtlsConfig
 import org.eclipse.californium.scandium.config.DtlsConfig.DtlsRole
+import org.eclipse.californium.scandium.config.DtlsConnectorConfig
 import org.eclipse.californium.scandium.dtls.cipher.CipherSuite.TLS_PSK_WITH_AES_256_CCM_8
 import org.eclipse.californium.scandium.dtls.pskstore.AdvancedMultiPskStore
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.configuration.properties.CoapProperties
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.configuration.properties.UdpProperties
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.configuration.psk.PskStoreStub
-import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
+import java.net.InetSocketAddress
 import java.util.concurrent.TimeUnit
 import org.eclipse.californium.elements.config.Configuration as CaliforniumConfiguration
 import org.springframework.context.annotation.Configuration as SpringConfiguration
 
 @SpringConfiguration
-@EnableConfigurationProperties(value = [CoapProperties::class, UdpProperties::class])
 class CoapConfiguration(private val coapProps: CoapProperties, private val udpProps: UdpProperties) {
 
     init {
@@ -67,7 +70,7 @@ class CoapConfiguration(private val coapProps: CoapProperties, private val udpPr
                 .set(UdpConfig.UDP_SEND_BUFFER_SIZE, udpProps.udpSendBufferSize)
                 .set(
                         SystemConfig.HEALTH_STATUS_INTERVAL,
-                        udpProps.healthStatusInterval.getSeconds(),
+                        udpProps.healthStatusIntervalInSeconds.seconds,
                         TimeUnit.SECONDS
                 )
     }
@@ -79,4 +82,21 @@ class CoapConfiguration(private val coapProps: CoapProperties, private val udpPr
                 .set(DtlsConfig.DTLS_CIPHER_SUITES, listOf(TLS_PSK_WITH_AES_256_CCM_8))
                 .set(DtlsConfig.DTLS_CLIENT_AUTHENTICATION_MODE, CertificateAuthenticationMode.NONE)
     }
+
+    @Bean
+    fun coapEndpoint(config: CaliforniumConfiguration, dtlsConnector: DTLSConnector): CoapEndpoint =
+            CoapEndpoint.Builder()
+                    .setConfiguration(config)
+                    .setConnector(dtlsConnector)
+                    .build()
+
+    @Bean
+    fun dtlsConnector(config: CaliforniumConfiguration, pskStore: AdvancedMultiPskStore) = DTLSConnector(
+            DtlsConnectorConfig
+                    .builder(config)
+                    .setAddress(InetSocketAddress(coapProps.coapsPort))
+                    .setAdvancedPskStore(pskStore)
+                    .setConnectionListener(MdcConnectionListener())
+                    .build()
+    )
 }

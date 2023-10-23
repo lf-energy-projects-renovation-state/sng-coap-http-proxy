@@ -15,29 +15,15 @@ config:
     preferred-block-size: 1024
 
   http:
-    url: "localhost:9000/sng-test"
-    protocol: "http"
-    ssl-bundle: "sngSslBundle"
-
+    url: "http://localhost:9000/sng-test/"
     connection-timeout: 5000ms
     response-timeout: 5000ms
 
   udp:
     udp-receive-buffer-size: 8192
     udp-send-buffer-size: 8192
-    health-status-interval: 60
-    health-status-interval-unit: SECONDS
+    health-status-interval-in-seconds: 60
 
   psk:
     default-id: "867787050253370"
     default-key: "ABCDEFGHIJKLMNOP"
-
-spring:
-  ssl:
-    bundle:
-      jks:
-        sngSslBundle:
-          truststore:
-            location: "classpath:ssl/truststore.jks"
-            password: "123456"
-            type: "PKCS12"

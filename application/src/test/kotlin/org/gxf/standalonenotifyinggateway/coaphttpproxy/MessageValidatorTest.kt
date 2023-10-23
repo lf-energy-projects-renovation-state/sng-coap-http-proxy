@@ -5,10 +5,7 @@ import org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.validation.MessageV
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.domain.Message
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.junit.jupiter.MockitoExtension
 
-@ExtendWith(MockitoExtension::class)
 class MessageValidatorTest {
 
     @Test

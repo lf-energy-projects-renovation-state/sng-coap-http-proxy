@@ -4,6 +4,7 @@
 
 package org.gxf.standalonenotifyinggateway.coaphttpproxy.coap
 
+import com.fasterxml.jackson.dataformat.cbor.databind.CBORMapper
 import mu.KotlinLogging
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.exception.InvalidMessageException
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.validation.MessageValidator
@@ -13,12 +14,16 @@ import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 
 @Service
-class CoapMessageHandler(private val httpClient: HttpClient, private val messageValidator: MessageValidator) {
+class MessageHandler(private val httpClient: HttpClient, private val messageValidator: MessageValidator) {
 
     private val logger = KotlinLogging.logger {}
+    private val cborMapper = CBORMapper()
 
-    fun handlePost(message: Message): ResponseEntity<String>? {
-        logger.debug { "Handling post, for message: $message." }
+    fun handlePost(id: String, payload: ByteArray): ResponseEntity<String>? {
+        val parsedJson = cborMapper.readTree(payload)
+        val message = Message(id, parsedJson)
+
+        logger.trace { "Handling post, for message: $message." }
 
         if (messageValidator.isValid(message)) {
             val response = httpClient.post(message)
@@ -26,7 +31,6 @@ class CoapMessageHandler(private val httpClient: HttpClient, private val message
             return response
         }
 
-        logger.warn { "Received invalid message: $message" }
         throw InvalidMessageException("Received invalid message: $message")
     }
 }

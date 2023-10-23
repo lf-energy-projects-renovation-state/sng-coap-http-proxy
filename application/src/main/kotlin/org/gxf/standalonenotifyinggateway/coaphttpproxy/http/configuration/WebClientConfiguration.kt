@@ -1,6 +1,6 @@
 package org.gxf.standalonenotifyinggateway.coaphttpproxy.http.configuration
 
-import org.gxf.standalonenotifyinggateway.coaphttpproxy.adapter.http.client.configuration.properties.HttpProperties
+import org.gxf.standalonenotifyinggateway.coaphttpproxy.http.configuration.properties.HttpProperties
 import org.springframework.boot.autoconfigure.web.reactive.function.client.WebClientSsl
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -12,10 +12,14 @@ class WebClientConfiguration(private val httpProps: HttpProperties) {
     @Bean
     fun webClient(webClientBuilder: WebClient.Builder, webClientSsl: WebClientSsl): WebClient {
         return webClientBuilder
-                .baseUrl("${httpProps.protocol}://${httpProps.url}/")
+                .baseUrl(httpProps.url)
                 .defaultHeader(HttpHeaders.ACCEPT, "application/json")
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, "application/json")
-                .apply(webClientSsl.fromBundle(httpProps.sslBundle))
+                .apply {
+                    if (httpProps.sslBundle != null) {
+                        it.apply(webClientSsl.fromBundle(httpProps.sslBundle))
+                    }
+                }
                 .build()
     }
 }

@@ -5,8 +5,8 @@
 package org.gxf.standalonenotifyinggateway.coaphttpproxy.http
 
 import mu.KotlinLogging
-import org.gxf.standalonenotifyinggateway.coaphttpproxy.adapter.http.client.configuration.properties.HttpProperties
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.domain.Message
+import org.gxf.standalonenotifyinggateway.coaphttpproxy.http.configuration.properties.HttpProperties
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
@@ -37,7 +37,7 @@ class HttpClient(private val httpProps: HttpProperties, private val webClient: W
     private fun executeRequest(id: String, body: String): ResponseEntity<String>? {
         return webClient
                 .post()
-                .uri { uriBuilder -> uriBuilder.path(id).build() }
+                .uri("/$id")
                 .bodyValue(body)
                 .retrieve()
                 .toEntity(String::class.java)
