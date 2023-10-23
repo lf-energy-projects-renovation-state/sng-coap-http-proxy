@@ -9,16 +9,24 @@ plugins {
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-web")
-
-    implementation(project(":components:kafka"))
-    implementation(project(":components:mqtt"))
+    implementation("org.springframework.boot:spring-boot-starter-webflux")
 
     runtimeOnly("io.micrometer:micrometer-registry-prometheus")
-    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+
+    implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
+    implementation(kotlin("reflect"))
+
+    implementation("org.eclipse.californium:californium-core:${rootProject.extra["californiumVersion"]}")
+    implementation("org.eclipse.californium:scandium:${rootProject.extra["californiumVersion"]}")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-cbor")
+
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("org.mockito:mockito-junit-jupiter")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:5.1.0")
 }
 
 tasks.withType<org.springframework.boot.gradle.tasks.bundling.BootBuildImage> {
-    imageName.set("ghcr.io/osgp/gxf-service-template:${version}")
+    imageName.set("ghcr.io/osgp/sng-coap-http-proxy:${version}")
     if (project.hasProperty("publishImage")) {
         publish.set(true)
         docker {
@@ -36,9 +44,13 @@ testing {
             useJUnitJupiter()
             dependencies {
                 implementation(project())
+                implementation("org.wiremock:wiremock:3.2.0")
                 implementation("org.springframework.boot:spring-boot-starter-test")
-                implementation("org.springframework.kafka:spring-kafka-test")
-                implementation("org.testcontainers:kafka:1.17.6")
+                implementation("org.mock-server:mockserver-spring-test-listener:${rootProject.extra["mockServerVersion"]}")
+                implementation("org.eclipse.californium:californium-core:${rootProject.extra["californiumVersion"]}")
+                implementation("org.eclipse.californium:scandium:${rootProject.extra["californiumVersion"]}")
+                implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-cbor")
+                implementation("io.github.microutils:kotlin-logging-jvm:${rootProject.extra["kotlinLoggingJvmVersion"]}")
             }
         }
     }

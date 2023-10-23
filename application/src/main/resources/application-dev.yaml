@@ -2,6 +2,15 @@
 #
 #SPDX-License-Identifier: Apache-2.0
 
+server:
+  port: 8181
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus
+
 config:
   coap:
     coaps-port: 55684
@@ -11,11 +20,11 @@ config:
     max-active-peers: 20000
     max-message-size: 1024
     max-peer-inactivity-period: 24h
-    max-resource-body-size: 8192
+    maxr-esource-body-size: 8192
     preferred-block-size: 1024
 
   http:
-    url: "http://localhost:9000/sng-test/"
+    url: "http://localhost:9000/sng/"
     connection-timeout: 5000ms
     response-timeout: 5000ms
 
