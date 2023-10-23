@@ -1,7 +1,8 @@
-package org.gxf.standalonenotifyinggateway.coaphttpproxy
 // SPDX-FileCopyrightText: Contributors to the GXF project
 //
 // SPDX-License-Identifier: Apache-2.0
+
+package org.gxf.standalonenotifyinggateway.coaphttpproxy
 
 import org.eclipse.californium.core.CoapClient
 import org.eclipse.californium.core.config.CoapConfig
