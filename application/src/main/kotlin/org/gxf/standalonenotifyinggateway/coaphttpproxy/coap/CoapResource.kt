@@ -52,8 +52,7 @@ class CoapResource(private val coapProps: CoapProperties, private val messageHan
     }
 
     private fun handleFailure(coapExchange: CoapExchange, e: Exception) {
-        logger.error { "Error while processing message from device: $e" }
-        logger.debug { e.printStackTrace() }
+        logger.error(e) { "Error while processing message from device" }
         coapExchange.respond(ResponseCode.BAD_GATEWAY)
     }
 }

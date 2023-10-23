@@ -37,10 +37,11 @@ class CoapConfiguration(private val coapProps: CoapProperties, private val udpPr
     }
 
     @Bean
-    fun pskStore(pskStoreStub: PskStoreStub) = AdvancedMultiPskStore()
-            .apply {
-                pskStoreStub.retrieveAll().forEach { psk -> this.setKey(psk.id, psk.key.toByteArray()) }
-            }
+    fun pskStore(pskStoreStub: PskStoreStub) =
+            AdvancedMultiPskStore()
+                    .apply {
+                        pskStoreStub.retrieveAll().forEach { psk -> this.setKey(psk.id, psk.key.toByteArray()) }
+                    }
 
     @Bean
     fun serverConfiguration(): CaliforniumConfiguration =
@@ -91,12 +92,13 @@ class CoapConfiguration(private val coapProps: CoapProperties, private val udpPr
                     .build()
 
     @Bean
-    fun dtlsConnector(config: CaliforniumConfiguration, pskStore: AdvancedMultiPskStore) = DTLSConnector(
-            DtlsConnectorConfig
-                    .builder(config)
-                    .setAddress(InetSocketAddress(coapProps.coapsPort))
-                    .setAdvancedPskStore(pskStore)
-                    .setConnectionListener(MdcConnectionListener())
-                    .build()
-    )
+    fun dtlsConnector(config: CaliforniumConfiguration, pskStore: AdvancedMultiPskStore) =
+            DTLSConnector(
+                    DtlsConnectorConfig
+                            .builder(config)
+                            .setAddress(InetSocketAddress(coapProps.coapsPort))
+                            .setAdvancedPskStore(pskStore)
+                            .setConnectionListener(MdcConnectionListener())
+                            .build()
+            )
 }
