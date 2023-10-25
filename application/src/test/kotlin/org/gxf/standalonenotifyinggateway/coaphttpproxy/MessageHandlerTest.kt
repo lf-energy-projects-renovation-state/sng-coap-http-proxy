@@ -52,7 +52,7 @@ class MessageHandlerTest {
 
         messageHandler.handlePost("12345", testCbor)
 
-        Mockito.verify(httpClient).post(check {
+        Mockito.verify(httpClient).postMessage(check {
             Assertions.assertEquals(message.deviceId, it.deviceId)
             Assertions.assertEquals(message.payload, it.payload)
         })

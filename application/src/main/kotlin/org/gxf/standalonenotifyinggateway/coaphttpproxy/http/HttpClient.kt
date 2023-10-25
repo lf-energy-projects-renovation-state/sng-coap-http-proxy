@@ -6,19 +6,29 @@ package org.gxf.standalonenotifyinggateway.coaphttpproxy.http
 
 import mu.KotlinLogging
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.domain.Message
+import org.gxf.standalonenotifyinggateway.coaphttpproxy.domain.ProxyError
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.http.configuration.properties.HttpProperties
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.reactive.function.client.bodyToMono
 
 @Component
 class HttpClient(private val httpProps: HttpProperties, private val webClient: WebClient) {
 
+    companion object {
+        const val ERROR_PATH = "/error"
+        const val MESSAGE_PATH = "/sng"
+    }
+
     private val logger = KotlinLogging.logger { }
 
-    fun post(message: Message): ResponseEntity<String>? {
-        val id = message.deviceId
-        val payload = message.payload
+    fun postError(proxyError: ProxyError) {
+        executeErrorRequest(proxyError)
+    }
+
+    fun postMessage(message: Message): ResponseEntity<String>? {
+        val (id, payload) = message
 
         logger.debug { "Posting message with id $id, body: $payload" }
 
@@ -37,10 +47,20 @@ class HttpClient(private val httpProps: HttpProperties, private val webClient: W
     private fun executeRequest(id: String, body: String): ResponseEntity<String>? {
         return webClient
                 .post()
-                .uri("/$id")
+                .uri("$MESSAGE_PATH/$id")
                 .bodyValue(body)
                 .retrieve()
                 .toEntity(String::class.java)
                 .block(httpProps.responseTimeout)
+    }
+
+    private fun executeErrorRequest(body: ProxyError) {
+        webClient
+                .post()
+                .uri(ERROR_PATH)
+                .bodyValue(body)
+                .retrieve()
+                .bodyToMono<Unit>()
+                .doOnError { logger.error { it } }
     }
 }

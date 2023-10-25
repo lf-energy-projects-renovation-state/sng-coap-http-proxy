@@ -9,6 +9,7 @@ import org.eclipse.californium.core.coap.CoAP.ResponseCode
 import org.eclipse.californium.core.server.resources.CoapExchange
 import org.eclipse.californium.elements.util.DatagramWriter
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.configuration.properties.CoapProperties
+import org.gxf.standalonenotifyinggateway.coaphttpproxy.domain.ProxyError
 import org.springframework.stereotype.Component
 import org.eclipse.californium.core.CoapResource as CaliforniumCoapResource
 
@@ -53,6 +54,7 @@ class CoapResource(private val coapProps: CoapProperties, private val messageHan
 
     private fun handleFailure(coapExchange: CoapExchange, e: Exception) {
         logger.error(e) { "Error while processing message from device" }
+        messageHandler.handleErrorPost(ProxyError(if (e.message != null) e.message!! else "No message", e.stackTraceToString()))
         coapExchange.respond(ResponseCode.BAD_GATEWAY)
     }
 }
