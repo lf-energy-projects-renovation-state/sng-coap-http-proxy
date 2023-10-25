@@ -61,6 +61,9 @@ class HttpClient(private val httpProps: HttpProperties, private val webClient: W
                 .bodyValue(body)
                 .retrieve()
                 .bodyToMono<Unit>()
-                .doOnError { logger.error { it } }
+                .doOnError {
+                    logger.error { it }
+                }
+                .block(httpProps.responseTimeout)
     }
 }

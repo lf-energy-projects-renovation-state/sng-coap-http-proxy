@@ -116,7 +116,7 @@ class IntegrationTest {
         val response = coapClient.advanced(request)
 
         val wiremockRequests = wiremock.findAll(WireMock.postRequestedFor(WireMock.urlPathTemplate("${HttpClient.MESSAGE_PATH}/{id}")))
-        val wiremockRequestsErrorEndpoint = wiremock.findAll(WireMock.postRequestedFor(WireMock.urlPathTemplate(HttpClient.ERROR_PATH)))
+        val wiremockRequestsErrorEndpoint = wiremock.findAll(WireMock.postRequestedFor(WireMock.urlPathEqualTo(HttpClient.ERROR_PATH)))
 
 
         Assertions.assertEquals(wiremockRequests.size, 1)
