@@ -7,6 +7,7 @@ plugins {
 }
 
 dependencies {
+    jacocoAggregation(project(":application"))
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
@@ -54,4 +55,27 @@ testing {
             }
         }
     }
+}
+
+
+// Integrate INTEGRATION_TEST results into the aggregated UNIT_TEST coverage results
+tasks.testCodeCoverageReport {
+    executionData.from(
+            configurations.aggregateCodeCoverageReportResults.get()
+                    .incoming.artifactView {
+                        lenient(true)
+                        withVariantReselection()
+                        attributes {
+                            attribute(Category.CATEGORY_ATTRIBUTE, objects.named(Category.VERIFICATION))
+                            attribute(TestSuiteType.TEST_SUITE_TYPE_ATTRIBUTE, objects.named(TestSuiteType.INTEGRATION_TEST))
+                            attribute(VerificationType.VERIFICATION_TYPE_ATTRIBUTE, objects.named(VerificationType.JACOCO_RESULTS))
+                            attribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, ArtifactTypeDefinition.BINARY_DATA_TYPE)
+                        }
+                    }.files
+    )
+}
+
+tasks.check {
+    dependsOn(tasks.testAggregateTestReport)
+    dependsOn(tasks.testCodeCoverageReport)
 }
