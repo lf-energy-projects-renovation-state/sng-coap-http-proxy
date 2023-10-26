@@ -4,7 +4,9 @@
 
 package org.gxf.standalonenotifyinggateway.coaphttpproxy
 
+import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.dataformat.cbor.databind.CBORMapper
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.*
@@ -41,9 +43,16 @@ class IntegrationTest {
     private val wiremockStubOk = post(urlPathTemplate("${HttpClient.MESSAGE_PATH}/{id}")).willReturn(ok("0"))
     private val wiremockStubError = post(urlPathTemplate("${HttpClient.MESSAGE_PATH}/{id}")).willReturn(aResponse().withFault(Fault.EMPTY_RESPONSE))
     private val wiremockStubErrorEndpoint = post(urlPathTemplate(HttpClient.ERROR_PATH)).willReturn(aResponse().withStatus(200))
+    private lateinit var jsonNode: JsonNode
 
     @BeforeEach
     fun beforeEach() {
+        jsonNode = ObjectMapper().readTree(""" 
+            {
+                "ID": "$securityContextId"
+            }
+            """)
+
         val url = URL(url)
         wiremock = WireMockServer(url.port)
         wiremock.stubFor(wiremockStubErrorEndpoint)
@@ -58,14 +67,7 @@ class IntegrationTest {
 
     @Test
     fun shouldForwardCoapMessageToHttp() {
-        //wiremock.stubFor(wiremockStubOk)
-
         val coapClient = coapClient.getClient()
-        val jsonNode = ObjectMapper().readTree(""" 
-            {
-                "ID": "$securityContextId"
-            }
-            """)
 
         val request =
                 Request.newPost()
@@ -86,17 +88,15 @@ class IntegrationTest {
     @Test
     fun shouldNotForwardCoapMessageToHttpWhenTheIdsDontMatch() {
         val coapClient = coapClient.getClient()
-        val jsonNode = ObjectMapper().readTree(""" 
-            {
-                "ID": "${securityContextId.plus("1")}"
-            }
-            """)
+
+        val jsonNodeWithInvalidId = (jsonNode as ObjectNode)
+                .put("ID", jsonNode.findValue("ID").asText().plus("1"))
 
         val request =
                 Request.newPost()
                         .apply {
                             options.setContentFormat(MediaTypeRegistry.APPLICATION_CBOR)
-                        }.setPayload(CBORMapper().writeValueAsBytes(jsonNode))
+                        }.setPayload(CBORMapper().writeValueAsBytes(jsonNodeWithInvalidId))
 
         val response = coapClient.advanced(request)
 
@@ -114,11 +114,6 @@ class IntegrationTest {
         wiremock.stubFor(wiremockStubError)
 
         val coapClient = coapClient.getClient()
-        val jsonNode = ObjectMapper().readTree(""" 
-            {
-                "ID": "$securityContextId"
-            }
-            """)
 
         val request =
                 Request.newPost()
