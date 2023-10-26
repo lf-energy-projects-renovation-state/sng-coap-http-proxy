@@ -24,7 +24,7 @@ config:
     preferred-block-size: 1024
 
   http:
-    url: "http://localhost:9000/sng/"
+    url: "http://localhost:9000"
     connection-timeout: 5000ms
     response-timeout: 5000ms
 
