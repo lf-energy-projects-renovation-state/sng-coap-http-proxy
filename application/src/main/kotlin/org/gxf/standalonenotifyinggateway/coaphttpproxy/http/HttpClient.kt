@@ -5,6 +5,7 @@
 package org.gxf.standalonenotifyinggateway.coaphttpproxy.http
 
 import mu.KotlinLogging
+import org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.exception.EmptyResponseException
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.domain.Message
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.domain.ProxyError
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.http.configuration.properties.HttpProperties
@@ -27,7 +28,7 @@ class HttpClient(private val httpProps: HttpProperties, private val webClient: W
         executeErrorRequest(proxyError)
     }
 
-    fun postMessage(message: Message): ResponseEntity<String>? {
+    fun postMessage(message: Message): ResponseEntity<String> {
         val (id, payload) = message
 
         logger.debug { "Posting message with id $id, body: $payload" }
@@ -35,6 +36,9 @@ class HttpClient(private val httpProps: HttpProperties, private val webClient: W
         try {
             val response = executeRequest(id, payload.toString())
             logger.debug { "Posted message with id $id, resulting response: $response." }
+            if (response == null) {
+                throw EmptyResponseException("Response body for device with Id: $id is null")
+            }
             return response
         } catch (e: Exception) {
             val error = e.message ?: "Unknown error"

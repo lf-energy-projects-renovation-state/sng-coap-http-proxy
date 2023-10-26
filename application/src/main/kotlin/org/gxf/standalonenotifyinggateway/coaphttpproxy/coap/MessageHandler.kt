@@ -20,7 +20,7 @@ class MessageHandler(private val httpClient: HttpClient, private val messageVali
     private val logger = KotlinLogging.logger {}
     private val cborMapper = CBORMapper()
 
-    fun handlePost(id: String, payload: ByteArray): ResponseEntity<String>? {
+    fun handlePost(id: String, payload: ByteArray): ResponseEntity<String> {
         val parsedJson = cborMapper.readTree(payload)
         val message = Message(id, parsedJson)
 
