@@ -60,6 +60,8 @@ testing {
 
 // Integrate INTEGRATION_TEST results into the aggregated UNIT_TEST coverage results
 tasks.testCodeCoverageReport {
+    dependsOn("copyReport")
+
     executionData.from(
             configurations.aggregateCodeCoverageReportResults.get()
                     .incoming.artifactView {
@@ -73,6 +75,12 @@ tasks.testCodeCoverageReport {
                         }
                     }.files
     )
+}
+
+tasks.register<Copy>("copyReport") {
+    from(layout.buildDirectory.file("reports/jacoco/testCodeCoverageReport/testCodeCoverageReport.xml"))
+    into(layout.buildDirectory.dir("jacoco/"))
+    rename("testCodeCoverageReport.xml", "jacoco.xml")
 }
 
 tasks.check {
