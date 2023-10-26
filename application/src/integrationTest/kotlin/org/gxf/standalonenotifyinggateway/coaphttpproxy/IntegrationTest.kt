@@ -62,7 +62,9 @@ class IntegrationTest {
 
         val coapClient = coapClient.getClient()
         val jsonNode = ObjectMapper().readTree(""" 
-            {"ID": "$securityContextId"}
+            {
+                "ID": "$securityContextId"
+            }
             """)
 
         val request =
@@ -85,7 +87,9 @@ class IntegrationTest {
     fun shouldNotForwardCoapMessageToHttpWhenTheIdsDontMatch() {
         val coapClient = coapClient.getClient()
         val jsonNode = ObjectMapper().readTree(""" 
-            {"ID": "${securityContextId.plus("1")}"}
+            {
+                "ID": "${securityContextId.plus("1")}"
+            }
             """)
 
         val request =
@@ -111,7 +115,9 @@ class IntegrationTest {
 
         val coapClient = coapClient.getClient()
         val jsonNode = ObjectMapper().readTree(""" 
-            {"ID": "$securityContextId"}
+            {
+                "ID": "$securityContextId"
+            }
             """)
 
         val request =
