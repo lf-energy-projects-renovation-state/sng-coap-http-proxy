@@ -13,30 +13,22 @@ plugins {
     kotlin("plugin.jpa") version "1.9.10" apply false
     id("org.sonarqube") version "4.4.1.3373"
     id("eclipse")
-    id("test-report-aggregation")
-    id("jacoco-report-aggregation")
-    jacoco
 }
 
 version = System.getenv("GITHUB_REF_NAME")?.replace("/", "-")?.lowercase() ?: "develop"
-
 sonar {
     properties {
         property("sonar.host.url", "https://sonarcloud.io")
         property("sonar.projectKey", "OSGP_sng-coap-http-proxy")
         property("sonar.organization", "gxf")
-        property("sonar.jacoco.reportPaths", "reports/jacoco/testCodeCoverageReport/testCodeCoverageReport.xml")
     }
 }
-tasks.sonar
 
 extra["archUnitVersion"] = "1.1.0"
 extra["californiumVersion"] = "3.8.0"
 extra["kotlinLoggingJvmVersion"] = "3.0.5"
 extra["mockitoKotlinVersion"] = "5.1.0"
 extra["mockServerVersion"] = "5.15.0"
-
-
 
 subprojects {
     apply(plugin = "org.jetbrains.kotlin.jvm")
@@ -46,7 +38,6 @@ subprojects {
     apply(plugin = "org.jetbrains.kotlin.plugin.jpa")
     apply(plugin = "jacoco")
     apply(plugin = "jacoco-report-aggregation")
-    apply(plugin = "test-report-aggregation")
 
     group = "org.gxf.standalonenotifyinggateway"
     version = rootProject.version
