@@ -25,7 +25,7 @@ sonar {
         property("sonar.host.url", "https://sonarcloud.io")
         property("sonar.projectKey", "OSGP_sng-coap-http-proxy")
         property("sonar.organization", "gxf")
-        property("sonar.java.coveragePlugin", "jacoco")
+        property("sonar.jacoco.reportPaths", "reports/jacoco/testCodeCoverageReport/testCodeCoverageReport.xml")
     }
 }
 tasks.sonar
