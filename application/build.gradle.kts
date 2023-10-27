@@ -60,8 +60,7 @@ testing {
 
 // Integrate INTEGRATION_TEST results into the aggregated UNIT_TEST coverage results
 tasks.testCodeCoverageReport {
-    dependsOn("copyReport")
-
+    sourceSets(sourceSets.main.get())
     executionData.from(
             configurations.aggregateCodeCoverageReportResults.get()
                     .incoming.artifactView {
@@ -75,6 +74,8 @@ tasks.testCodeCoverageReport {
                         }
                     }.files
     )
+
+    finalizedBy("copyReport")
 }
 
 tasks.register<Copy>("copyReport") {
