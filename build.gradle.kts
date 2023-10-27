@@ -21,6 +21,7 @@ sonar {
         property("sonar.host.url", "https://sonarcloud.io")
         property("sonar.projectKey", "OSGP_sng-coap-http-proxy")
         property("sonar.organization", "gxf")
+        property("sonar.gradle.skipCompile", true)
     }
 }
 
