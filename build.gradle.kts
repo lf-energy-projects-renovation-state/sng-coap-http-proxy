@@ -16,15 +16,14 @@ plugins {
 }
 
 version = System.getenv("GITHUB_REF_NAME")?.replace("/", "-")?.lowercase() ?: "develop"
-
 sonar {
     properties {
         property("sonar.host.url", "https://sonarcloud.io")
         property("sonar.projectKey", "OSGP_sng-coap-http-proxy")
         property("sonar.organization", "gxf")
+        property("sonar.gradle.skipCompile", true)
     }
 }
-tasks.sonar
 
 extra["archUnitVersion"] = "1.1.0"
 extra["californiumVersion"] = "3.8.0"
@@ -38,6 +37,8 @@ subprojects {
     apply(plugin = "io.spring.dependency-management")
     apply(plugin = "eclipse")
     apply(plugin = "org.jetbrains.kotlin.plugin.jpa")
+    apply(plugin = "jacoco")
+    apply(plugin = "jacoco-report-aggregation")
 
     group = "org.gxf.standalonenotifyinggateway"
     version = rootProject.version

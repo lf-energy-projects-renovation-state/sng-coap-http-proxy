@@ -23,6 +23,9 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("org.mockito:mockito-junit-jupiter")
     testImplementation("org.mockito.kotlin:mockito-kotlin:5.1.0")
+
+    // Generate test and integration test reports
+    jacocoAggregation(project(":application"))
 }
 
 tasks.withType<org.springframework.boot.gradle.tasks.bundling.BootBuildImage> {
