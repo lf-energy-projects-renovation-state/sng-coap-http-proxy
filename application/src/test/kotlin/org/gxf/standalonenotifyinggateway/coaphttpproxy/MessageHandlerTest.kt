@@ -11,10 +11,13 @@ import org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.exception.InvalidMe
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.validation.MessageValidator
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.domain.Message
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.http.HttpClient
+import org.gxf.standalonenotifyinggateway.coaphttpproxy.logging.RemoteLogger
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.*
+import org.mockito.InjectMocks
+import org.mockito.Mock
+import org.mockito.Mockito
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.check
@@ -29,6 +32,9 @@ class MessageHandlerTest {
     @Mock
     private lateinit var messageValidator: MessageValidator
 
+    @Mock
+    private lateinit var remoteLogger: RemoteLogger
+
     @InjectMocks
     private lateinit var messageHandler: MessageHandler
 
@@ -36,11 +42,12 @@ class MessageHandlerTest {
     private val testCbor = CBORMapper().writeValueAsBytes(testJsonNode)
 
     @Test
-    fun shouldThrowWhenInvalidMessage() {
+    fun shouldCallRemoteLoggerWhenMessageIsInvalid() {
         Mockito.`when`(messageValidator.isValid(any<Message>())).thenReturn(false)
 
         Assertions.assertThrows(InvalidMessageException::class.java) {
             messageHandler.handlePost("12345", testCbor)
+            Mockito.verify(remoteLogger).error(any())
         }
     }
 
