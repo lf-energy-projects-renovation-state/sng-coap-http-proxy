@@ -7,15 +7,14 @@ package org.gxf.standalonenotifyinggateway.coaphttpproxy.http
 import mu.KotlinLogging
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.exception.EmptyResponseException
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.domain.Message
-import org.gxf.standalonenotifyinggateway.coaphttpproxy.domain.ProxyError
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.http.configuration.properties.HttpProperties
+import org.gxf.standalonenotifyinggateway.coaphttpproxy.logging.RemoteLogger
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
-import org.springframework.web.reactive.function.client.bodyToMono
 
 @Component
-class HttpClient(private val httpProps: HttpProperties, private val webClient: WebClient) {
+class HttpClient(private val httpProps: HttpProperties, private val webClient: WebClient, private val remoteLogger: RemoteLogger) {
 
     companion object {
         const val ERROR_PATH = "/error"
@@ -23,10 +22,6 @@ class HttpClient(private val httpProps: HttpProperties, private val webClient: W
     }
 
     private val logger = KotlinLogging.logger { }
-
-    fun postError(proxyError: ProxyError) {
-        executeErrorRequest(proxyError)
-    }
 
     fun postMessage(message: Message): ResponseEntity<String> {
         val (id, payload) = message
@@ -37,13 +32,12 @@ class HttpClient(private val httpProps: HttpProperties, private val webClient: W
             val response = executeRequest(id, payload.toString())
             logger.debug { "Posted message with id $id, resulting response: $response." }
             if (response == null) {
+                remoteLogger.error { "Response body for device with Id: $id is null" }
                 throw EmptyResponseException("Response body for device with Id: $id is null")
             }
             return response
         } catch (e: Exception) {
-            val error = e.message ?: "Unknown error"
-            logger.error { "Failure while posting message with id $id, error: $error" }
-            logger.debug { e.printStackTrace() }
+            logger.error(e) { "Failure while posting message with id $id" }
             throw e
         }
     }
@@ -55,19 +49,6 @@ class HttpClient(private val httpProps: HttpProperties, private val webClient: W
                 .bodyValue(body)
                 .retrieve()
                 .toEntity(String::class.java)
-                .block(httpProps.responseTimeout)
-    }
-
-    private fun executeErrorRequest(body: ProxyError) {
-        webClient
-                .post()
-                .uri(ERROR_PATH)
-                .bodyValue(body)
-                .retrieve()
-                .bodyToMono<Unit>()
-                .doOnError {
-                    logger.error { it }
-                }
                 .block(httpProps.responseTimeout)
     }
 }

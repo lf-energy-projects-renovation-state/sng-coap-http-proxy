@@ -9,13 +9,13 @@ import mu.KotlinLogging
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.exception.InvalidMessageException
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.validation.MessageValidator
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.domain.Message
-import org.gxf.standalonenotifyinggateway.coaphttpproxy.domain.ProxyError
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.http.HttpClient
+import org.gxf.standalonenotifyinggateway.coaphttpproxy.logging.RemoteLogger
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 
 @Service
-class MessageHandler(private val httpClient: HttpClient, private val messageValidator: MessageValidator) {
+class MessageHandler(private val httpClient: HttpClient, private val messageValidator: MessageValidator, private val remoteLogger: RemoteLogger) {
 
     private val logger = KotlinLogging.logger {}
     private val cborMapper = CBORMapper()
@@ -32,10 +32,7 @@ class MessageHandler(private val httpClient: HttpClient, private val messageVali
             return response
         }
 
+        remoteLogger.error { "Received invalid message: $message" }
         throw InvalidMessageException("Received invalid message: $message")
-    }
-
-    fun handleErrorPost(error: ProxyError) {
-        httpClient.postError(error)
     }
 }
