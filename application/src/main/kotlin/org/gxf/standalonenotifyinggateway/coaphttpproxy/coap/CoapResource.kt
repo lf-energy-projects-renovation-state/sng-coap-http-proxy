@@ -11,12 +11,12 @@ import org.eclipse.californium.elements.util.DatagramWriter
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.configuration.properties.CoapProperties
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.exception.EmptyResponseException
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.exception.InvalidMessageException
-import org.gxf.standalonenotifyinggateway.coaphttpproxy.domain.ProxyError
+import org.gxf.standalonenotifyinggateway.coaphttpproxy.logging.RemoteLogger
 import org.springframework.stereotype.Component
 import org.eclipse.californium.core.CoapResource as CaliforniumCoapResource
 
 @Component
-class CoapResource(private val coapProps: CoapProperties, private val messageHandler: MessageHandler) :
+class CoapResource(private val coapProps: CoapProperties, private val messageHandler: MessageHandler, private val remoteLogger: RemoteLogger) :
         CaliforniumCoapResource(coapProps.path) {
 
     private val logger = KotlinLogging.logger { }
@@ -36,8 +36,8 @@ class CoapResource(private val coapProps: CoapProperties, private val messageHan
             writeResponse(coapExchange, response.body!!)
         } catch (e: Exception) {
             when (e) {
-                is EmptyResponseException -> handleHttpFailure(coapExchange, e)
-                is InvalidMessageException -> handleInvalidMessage(coapExchange, e)
+                is EmptyResponseException -> handleHttpFailure(coapExchange)
+                is InvalidMessageException -> handleInvalidMessage(coapExchange)
                 else -> handleUnexpectedError(coapExchange, e)
             }
         }
@@ -59,22 +59,15 @@ class CoapResource(private val coapProps: CoapProperties, private val messageHan
     }
 
     private fun handleUnexpectedError(coapExchange: CoapExchange, e: Exception) {
-        sendErrorMessageToDeviceService(e)
+        remoteLogger.error(e) { "Unexpected error occurred" }
         coapExchange.respond(ResponseCode.BAD_GATEWAY)
     }
 
-    private fun handleInvalidMessage(coapExchange: CoapExchange, e: InvalidMessageException) {
-        sendErrorMessageToDeviceService(e)
+    private fun handleInvalidMessage(coapExchange: CoapExchange) {
         coapExchange.respond(ResponseCode.BAD_GATEWAY)
     }
 
-    private fun handleHttpFailure(coapExchange: CoapExchange, e: EmptyResponseException) {
-        sendErrorMessageToDeviceService(e)
+    private fun handleHttpFailure(coapExchange: CoapExchange) {
         writeResponse(coapExchange, "0")
-    }
-
-    private fun sendErrorMessageToDeviceService(e: Exception) {
-        logger.error(e) { "Error while processing message from device" }
-        messageHandler.handleErrorPost(ProxyError(e.message ?: "No message", e.stackTraceToString()))
     }
 }
