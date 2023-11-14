@@ -7,6 +7,7 @@ import org.eclipse.californium.scandium.dtls.PskSecretResult
 import org.eclipse.californium.scandium.dtls.pskstore.AdvancedPskStore
 import org.eclipse.californium.scandium.util.SecretUtil
 import org.eclipse.californium.scandium.util.ServerNames
+import org.gxf.standalonenotifyinggateway.coaphttpproxy.http.HttpClient.Companion.PSK_PATH
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.logging.RemoteLogger
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Component
@@ -50,7 +51,7 @@ class RemotePskStore(private val webClient: WebClient, private val remoteLogger:
     private fun getKeyForIdentity(identity: String): ResponseEntity<String>? {
         return webClient
                 .get()
-                .uri("psk")
+                .uri(PSK_PATH)
                 .header("x-device-identity", identity)
                 .retrieve()
                 .toEntity(String::class.java)
