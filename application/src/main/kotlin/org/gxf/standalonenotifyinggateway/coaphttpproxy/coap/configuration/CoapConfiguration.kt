@@ -16,11 +16,12 @@ import org.eclipse.californium.scandium.config.DtlsConfig
 import org.eclipse.californium.scandium.config.DtlsConfig.DtlsRole
 import org.eclipse.californium.scandium.config.DtlsConnectorConfig
 import org.eclipse.californium.scandium.dtls.cipher.CipherSuite.TLS_PSK_WITH_AES_256_CCM_8
-import org.eclipse.californium.scandium.dtls.pskstore.AdvancedMultiPskStore
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.configuration.properties.CoapProperties
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.configuration.properties.UdpProperties
-import org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.configuration.psk.PskStoreStub
+import org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.configuration.psk.RemotePskStore
+import org.gxf.standalonenotifyinggateway.coaphttpproxy.logging.RemoteLogger
 import org.springframework.context.annotation.Bean
+import org.springframework.web.reactive.function.client.WebClient
 import java.net.InetSocketAddress
 import java.util.concurrent.TimeUnit
 import org.eclipse.californium.elements.config.Configuration as CaliforniumConfiguration
@@ -37,11 +38,8 @@ class CoapConfiguration(private val coapProps: CoapProperties, private val udpPr
     }
 
     @Bean
-    fun pskStore(pskStoreStub: PskStoreStub) =
-            AdvancedMultiPskStore()
-                    .apply {
-                        pskStoreStub.retrieveAll().forEach { psk -> this.setKey(psk.id, psk.key.toByteArray()) }
-                    }
+    fun pskStore(webClient: WebClient, remoteLogger: RemoteLogger) =
+            RemotePskStore(webClient, remoteLogger)
 
     @Bean
     fun serverConfiguration(): CaliforniumConfiguration =
@@ -92,12 +90,12 @@ class CoapConfiguration(private val coapProps: CoapProperties, private val udpPr
                     .build()
 
     @Bean
-    fun dtlsConnector(config: CaliforniumConfiguration, pskStore: AdvancedMultiPskStore) =
+    fun dtlsConnector(config: CaliforniumConfiguration, remotePskStore: RemotePskStore) =
             DTLSConnector(
                     DtlsConnectorConfig
                             .builder(config)
                             .setAddress(InetSocketAddress(coapProps.coapsPort))
-                            .setAdvancedPskStore(pskStore)
+                            .setAdvancedPskStore(remotePskStore)
                             .setConnectionListener(MdcConnectionListener())
                             .build()
             )
