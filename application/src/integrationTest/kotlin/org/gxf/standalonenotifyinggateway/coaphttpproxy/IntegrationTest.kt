@@ -24,7 +24,6 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
 import java.net.URL
-import java.util.*
 
 @Import(IntegrationTestCoapClient::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -36,10 +35,14 @@ class IntegrationTest {
     @Value("\${config.psk.default-id}")
     private lateinit var securityContextId: String
 
+    @Value("\${config.psk.default-key}")
+    private lateinit var defaultKey: String
+
     @Autowired
     private lateinit var coapClient: IntegrationTestCoapClient
 
     private lateinit var wiremock: WireMockServer
+
     private val wiremockStubOk = post(urlPathTemplate("${HttpClient.MESSAGE_PATH}/{id}")).willReturn(ok("0"))
     private val wiremockStubError = post(urlPathTemplate("${HttpClient.MESSAGE_PATH}/{id}")).willReturn(aResponse().withFault(Fault.EMPTY_RESPONSE))
     private val wiremockStubErrorEndpoint = post(urlPathTemplate(HttpClient.ERROR_PATH)).willReturn(aResponse().withStatus(200))
@@ -47,6 +50,8 @@ class IntegrationTest {
 
     @BeforeEach
     fun beforeEach() {
+        val wiremockStubPsk = get(urlPathTemplate(HttpClient.PSK_PATH)).willReturn(ok(defaultKey))
+
         jsonNode = ObjectMapper().readTree(""" 
             {
                 "ID": "$securityContextId"
@@ -57,6 +62,7 @@ class IntegrationTest {
         wiremock = WireMockServer(url.port)
         wiremock.stubFor(wiremockStubErrorEndpoint)
         wiremock.stubFor(wiremockStubOk)
+        wiremock.stubFor(wiremockStubPsk)
         wiremock.start()
     }
 
