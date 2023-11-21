@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: Contributors to the GXF project
+//
+// SPDX-License-Identifier: Apache-2.0
+
 package org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.configuration.psk
 
 import org.eclipse.californium.scandium.dtls.ConnectionId
@@ -49,12 +53,20 @@ class RemotePskStore(private val webClient: WebClient, private val remoteLogger:
     }
 
     private fun getKeyForIdentity(identity: String): ResponseEntity<String>? {
-        return webClient
-                .get()
-                .uri(PSK_PATH)
-                .header("x-device-identity", identity)
-                .retrieve()
-                .toEntity(String::class.java)
-                .block(Duration.ofMillis(10000))
+        try {
+            return webClient
+                    .get()
+                    .uri(PSK_PATH)
+                    .header("x-device-identity", identity)
+                    .retrieve()
+                    .toEntity(String::class.java)
+                    .block(Duration.ofMillis(10000))
+        } catch (e: Exception) {
+            remoteLogger.error {
+                "Unknown exception thrown while retrieving the key for $identity, " +
+                        "with exception ${e.message} and stacktrace ${e.stackTrace}"
+            }
+            throw e
+        }
     }
 }
