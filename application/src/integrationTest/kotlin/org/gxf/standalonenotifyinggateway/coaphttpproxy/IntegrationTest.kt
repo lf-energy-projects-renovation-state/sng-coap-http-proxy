@@ -14,32 +14,32 @@ import com.github.tomakehurst.wiremock.http.Fault
 import org.eclipse.californium.core.coap.CoAP
 import org.eclipse.californium.core.coap.MediaTypeRegistry
 import org.eclipse.californium.core.coap.Request
+import org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.configuration.properties.PskStubProperties
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.http.HttpClient
+import org.gxf.standalonenotifyinggateway.coaphttpproxy.http.configuration.properties.HttpProperties
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
 import java.net.URL
 
 @Import(IntegrationTestCoapClient::class)
+@EnableConfigurationProperties(PskStubProperties::class, HttpProperties::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class IntegrationTest {
 
-    @Value("\${config.http.url}")
-    private lateinit var url: String
-
-    @Value("\${config.psk.default-id}")
-    private lateinit var securityContextId: String
-
-    @Value("\${config.psk.default-key}")
-    private lateinit var defaultKey: String
-
     @Autowired
     private lateinit var coapClient: IntegrationTestCoapClient
+
+    @Autowired
+    private lateinit var pskStubProperties: PskStubProperties
+
+    @Autowired
+    private lateinit var httpProperties: HttpProperties
 
     private lateinit var wiremock: WireMockServer
 
@@ -50,15 +50,15 @@ class IntegrationTest {
 
     @BeforeEach
     fun beforeEach() {
-        val wiremockStubPsk = get(urlPathTemplate(HttpClient.PSK_PATH)).willReturn(ok(defaultKey))
+        val wiremockStubPsk = get(urlPathTemplate(HttpClient.PSK_PATH)).willReturn(ok(pskStubProperties.defaultKey))
 
         jsonNode = ObjectMapper().readTree(""" 
             {
-                "ID": "$securityContextId"
+                "ID": "${pskStubProperties.defaultId}"
             }
             """)
 
-        val url = URL(url)
+        val url = URL(httpProperties.url)
         wiremock = WireMockServer(url.port)
         wiremock.stubFor(wiremockStubErrorEndpoint)
         wiremock.stubFor(wiremockStubOk)
