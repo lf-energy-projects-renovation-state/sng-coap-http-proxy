@@ -11,35 +11,38 @@ import com.fasterxml.jackson.dataformat.cbor.databind.CBORMapper
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.http.Fault
+import org.assertj.core.api.Assertions.assertThat
 import org.eclipse.californium.core.coap.CoAP
 import org.eclipse.californium.core.coap.MediaTypeRegistry
 import org.eclipse.californium.core.coap.Request
+import org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.configuration.properties.PskStubProperties
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.http.HttpClient
+import org.gxf.standalonenotifyinggateway.coaphttpproxy.http.configuration.properties.HttpProperties
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
 import java.net.URL
-import java.util.*
 
 @Import(IntegrationTestCoapClient::class)
+@EnableConfigurationProperties(PskStubProperties::class, HttpProperties::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class IntegrationTest {
-
-    @Value("\${config.http.url}")
-    private lateinit var url: String
-
-    @Value("\${config.psk.default-id}")
-    private lateinit var securityContextId: String
 
     @Autowired
     private lateinit var coapClient: IntegrationTestCoapClient
 
+    @Autowired
+    private lateinit var pskStubProperties: PskStubProperties
+
+    @Autowired
+    private lateinit var httpProperties: HttpProperties
+
     private lateinit var wiremock: WireMockServer
+
     private val wiremockStubOk = post(urlPathTemplate("${HttpClient.MESSAGE_PATH}/{id}")).willReturn(ok("0"))
     private val wiremockStubError = post(urlPathTemplate("${HttpClient.MESSAGE_PATH}/{id}")).willReturn(aResponse().withFault(Fault.EMPTY_RESPONSE))
     private val wiremockStubErrorEndpoint = post(urlPathTemplate(HttpClient.ERROR_PATH)).willReturn(aResponse().withStatus(200))
@@ -47,16 +50,19 @@ class IntegrationTest {
 
     @BeforeEach
     fun beforeEach() {
+        val wiremockStubPsk = get(urlPathTemplate(HttpClient.PSK_PATH)).willReturn(ok(pskStubProperties.defaultKey))
+
         jsonNode = ObjectMapper().readTree(""" 
             {
-                "ID": "$securityContextId"
+                "ID": "${pskStubProperties.defaultId}"
             }
             """)
 
-        val url = URL(url)
+        val url = URL(httpProperties.url)
         wiremock = WireMockServer(url.port)
         wiremock.stubFor(wiremockStubErrorEndpoint)
         wiremock.stubFor(wiremockStubOk)
+        wiremock.stubFor(wiremockStubPsk)
         wiremock.start()
     }
 
@@ -79,8 +85,8 @@ class IntegrationTest {
 
         val wiremockRequests = wiremock.findAll(postRequestedFor(urlPathTemplate("${HttpClient.MESSAGE_PATH}/{id}")))
 
-        assertEquals(wiremockRequests.size, 1)
-        assertEquals(jsonNode, ObjectMapper().readTree(wiremockRequests.first().bodyAsString))
+        assertThat(wiremockRequests).hasSize(1)
+        assertThat(ObjectMapper().readTree(wiremockRequests.first().bodyAsString)).isEqualTo(jsonNode)
     }
 
     // When a error occurs should not forward the coap message to the next service
@@ -103,10 +109,9 @@ class IntegrationTest {
         val wiremockRequestsSng = wiremock.findAll(postRequestedFor(urlPathTemplate("${HttpClient.MESSAGE_PATH}/{id}")))
         val wiremockRequestsError = wiremock.findAll(postRequestedFor(urlPathTemplate(HttpClient.ERROR_PATH)))
 
-
-        assertEquals(0, wiremockRequestsSng.size)
-        assertEquals(1, wiremockRequestsError.size)
-        assertEquals(CoAP.ResponseCode.BAD_GATEWAY, response.code)
+        assertThat(wiremockRequestsSng).hasSize(0)
+        assertThat(wiremockRequestsError).hasSize(1)
+        assertThat(response.code).isEqualTo(CoAP.ResponseCode.BAD_GATEWAY)
     }
 
     @Test
@@ -127,8 +132,8 @@ class IntegrationTest {
         val wiremockRequestsErrorEndpoint = wiremock.findAll(postRequestedFor(urlPathEqualTo(HttpClient.ERROR_PATH)))
 
 
-        assertEquals(wiremockRequests.size, 1)
-        assertEquals(wiremockRequestsErrorEndpoint.size, 1)
-        assertEquals(CoAP.ResponseCode.BAD_GATEWAY, response.code)
+        assertThat(wiremockRequestsErrorEndpoint).hasSize(1)
+        assertThat(wiremockRequests).hasSize(1)
+        assertThat(response.code).isEqualTo(CoAP.ResponseCode.BAD_GATEWAY)
     }
 }

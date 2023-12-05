@@ -5,9 +5,9 @@
 package org.gxf.standalonenotifyinggateway.coaphttpproxy
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.assertj.core.api.Assertions.assertThat
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.validation.MessageValidator
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.domain.Message
-import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
 class MessageValidatorTest {
@@ -19,7 +19,7 @@ class MessageValidatorTest {
 
         val result = MessageValidator().isValid(testMessage)
 
-        Assertions.assertTrue(result)
+        assertThat(result).isTrue()
     }
 
     @Test
@@ -29,6 +29,6 @@ class MessageValidatorTest {
 
         val result = MessageValidator().isValid(testMessage)
 
-        Assertions.assertFalse(result)
+        assertThat(result).isFalse()
     }
 }

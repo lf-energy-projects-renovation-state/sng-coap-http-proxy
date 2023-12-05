@@ -16,10 +16,9 @@ import org.eclipse.californium.scandium.config.DtlsConfig
 import org.eclipse.californium.scandium.config.DtlsConfig.DtlsRole
 import org.eclipse.californium.scandium.config.DtlsConnectorConfig
 import org.eclipse.californium.scandium.dtls.cipher.CipherSuite.TLS_PSK_WITH_AES_256_CCM_8
-import org.eclipse.californium.scandium.dtls.pskstore.AdvancedMultiPskStore
+import org.eclipse.californium.scandium.dtls.pskstore.AdvancedPskStore
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.configuration.properties.CoapProperties
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.configuration.properties.UdpProperties
-import org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.configuration.psk.PskStoreStub
 import org.springframework.context.annotation.Bean
 import java.net.InetSocketAddress
 import java.util.concurrent.TimeUnit
@@ -35,13 +34,6 @@ class CoapConfiguration(private val coapProps: CoapProperties, private val udpPr
         UdpConfig.register()
         TcpConfig.register()
     }
-
-    @Bean
-    fun pskStore(pskStoreStub: PskStoreStub) =
-            AdvancedMultiPskStore()
-                    .apply {
-                        pskStoreStub.retrieveAll().forEach { psk -> this.setKey(psk.id, psk.key.toByteArray()) }
-                    }
 
     @Bean
     fun serverConfiguration(): CaliforniumConfiguration =
@@ -92,12 +84,12 @@ class CoapConfiguration(private val coapProps: CoapProperties, private val udpPr
                     .build()
 
     @Bean
-    fun dtlsConnector(config: CaliforniumConfiguration, pskStore: AdvancedMultiPskStore) =
+    fun dtlsConnector(config: CaliforniumConfiguration, remotePskStore: AdvancedPskStore) =
             DTLSConnector(
                     DtlsConnectorConfig
                             .builder(config)
                             .setAddress(InetSocketAddress(coapProps.coapsPort))
-                            .setAdvancedPskStore(pskStore)
+                            .setAdvancedPskStore(remotePskStore)
                             .setConnectionListener(MdcConnectionListener())
                             .build()
             )

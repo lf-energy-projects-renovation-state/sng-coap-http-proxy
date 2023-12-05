@@ -19,6 +19,7 @@ class HttpClient(private val httpProps: HttpProperties, private val webClient: W
     companion object {
         const val ERROR_PATH = "/error"
         const val MESSAGE_PATH = "/sng"
+        const val PSK_PATH = "/psk"
     }
 
     private val logger = KotlinLogging.logger { }

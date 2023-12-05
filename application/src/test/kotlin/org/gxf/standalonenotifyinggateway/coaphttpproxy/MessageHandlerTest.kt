@@ -6,18 +6,20 @@ package org.gxf.standalonenotifyinggateway.coaphttpproxy
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.cbor.databind.CBORMapper
+import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.catchThrowable
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.MessageHandler
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.exception.InvalidMessageException
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.validation.MessageValidator
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.domain.Message
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.http.HttpClient
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.logging.RemoteLogger
-import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
-import org.mockito.Mockito
+import org.mockito.Mockito.verify
+import org.mockito.Mockito.`when`
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.check
@@ -43,25 +45,26 @@ class MessageHandlerTest {
 
     @Test
     fun shouldCallRemoteLoggerWhenMessageIsInvalid() {
-        Mockito.`when`(messageValidator.isValid(any<Message>())).thenReturn(false)
+        `when`(messageValidator.isValid(any<Message>())).thenReturn(false)
 
-        Assertions.assertThrows(InvalidMessageException::class.java) {
+        val thrownException = catchThrowable {
             messageHandler.handlePost("12345", testCbor)
-            Mockito.verify(remoteLogger).error(any())
+            verify(remoteLogger).error(any())
         }
+
+        assertThat(thrownException).isInstanceOf(InvalidMessageException::class.java)
     }
 
     @Test
     fun callHttpClientWhenMessageIsValid() {
         val message = Message("12345", testJsonNode)
 
-        Mockito.`when`(messageValidator.isValid(any<Message>())).thenReturn(true)
+        `when`(messageValidator.isValid(any<Message>())).thenReturn(true)
 
         messageHandler.handlePost("12345", testCbor)
 
-        Mockito.verify(httpClient).postMessage(check {
-            Assertions.assertEquals(message.deviceId, it.deviceId)
-            Assertions.assertEquals(message.payload, it.payload)
+        verify(httpClient).postMessage(check {
+            assertThat(it).usingRecursiveComparison().isEqualTo(message)
         })
     }
 }
