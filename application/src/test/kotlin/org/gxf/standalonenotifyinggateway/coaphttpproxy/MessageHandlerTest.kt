@@ -7,7 +7,7 @@ package org.gxf.standalonenotifyinggateway.coaphttpproxy
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.cbor.databind.CBORMapper
 import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.assertThatThrownBy
+import org.assertj.core.api.Assertions.catchThrowable
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.MessageHandler
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.exception.InvalidMessageException
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.validation.MessageValidator
@@ -47,10 +47,12 @@ class MessageHandlerTest {
     fun shouldCallRemoteLoggerWhenMessageIsInvalid() {
         `when`(messageValidator.isValid(any<Message>())).thenReturn(false)
 
-        assertThatThrownBy {
+        val thrownException = catchThrowable {
             messageHandler.handlePost("12345", testCbor)
             verify(remoteLogger).error(any())
-        }.isInstanceOf(InvalidMessageException::class.java)
+        }
+
+        assertThat(thrownException).isInstanceOf(InvalidMessageException::class.java)
     }
 
     @Test
@@ -62,7 +64,7 @@ class MessageHandlerTest {
         messageHandler.handlePost("12345", testCbor)
 
         verify(httpClient).postMessage(check {
-            assertThat(message).usingRecursiveComparison().isEqualTo(it)
+            assertThat(it).usingRecursiveComparison().isEqualTo(message)
         })
     }
 }

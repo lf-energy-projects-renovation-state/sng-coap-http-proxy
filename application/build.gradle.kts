@@ -20,10 +20,9 @@ dependencies {
     implementation("org.eclipse.californium:scandium:${rootProject.extra["californiumVersion"]}")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-cbor")
 
-    testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("org.mockito:mockito-junit-jupiter")
     testImplementation("org.mockito.kotlin:mockito-kotlin:5.1.0")
-    testImplementation("org.assertj:assertj-core:3.24.2")
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
 
     // Generate test and integration test reports
     jacocoAggregation(project(":application"))

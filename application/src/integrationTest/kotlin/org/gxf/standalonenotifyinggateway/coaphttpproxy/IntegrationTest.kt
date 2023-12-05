@@ -86,7 +86,7 @@ class IntegrationTest {
         val wiremockRequests = wiremock.findAll(postRequestedFor(urlPathTemplate("${HttpClient.MESSAGE_PATH}/{id}")))
 
         assertThat(wiremockRequests).hasSize(1)
-        assertThat(jsonNode).isEqualTo(ObjectMapper().readTree(wiremockRequests.first().bodyAsString))
+        assertThat(ObjectMapper().readTree(wiremockRequests.first().bodyAsString)).isEqualTo(jsonNode)
     }
 
     // When a error occurs should not forward the coap message to the next service
@@ -111,7 +111,7 @@ class IntegrationTest {
 
         assertThat(wiremockRequestsSng).hasSize(0)
         assertThat(wiremockRequestsError).hasSize(1)
-        assertThat(CoAP.ResponseCode.BAD_GATEWAY).isEqualTo(response.code)
+        assertThat(response.code).isEqualTo(CoAP.ResponseCode.BAD_GATEWAY)
     }
 
     @Test
@@ -134,6 +134,6 @@ class IntegrationTest {
 
         assertThat(wiremockRequestsErrorEndpoint).hasSize(1)
         assertThat(wiremockRequests).hasSize(1)
-        assertThat(CoAP.ResponseCode.BAD_GATEWAY).isEqualTo(response.code)
+        assertThat(response.code).isEqualTo(CoAP.ResponseCode.BAD_GATEWAY)
     }
 }
