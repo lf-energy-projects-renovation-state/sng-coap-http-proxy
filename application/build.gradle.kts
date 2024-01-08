@@ -13,7 +13,7 @@ dependencies {
 
     runtimeOnly("io.micrometer:micrometer-registry-prometheus")
 
-    implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
+    implementation("io.github.oshai:kotlin-logging-jvm:6.0.1")
     implementation(kotlin("reflect"))
 
     implementation("org.eclipse.californium:californium-core:${rootProject.extra["californiumVersion"]}")

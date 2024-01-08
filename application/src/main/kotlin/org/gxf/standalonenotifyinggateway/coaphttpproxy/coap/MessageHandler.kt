@@ -5,7 +5,7 @@
 package org.gxf.standalonenotifyinggateway.coaphttpproxy.coap
 
 import com.fasterxml.jackson.dataformat.cbor.databind.CBORMapper
-import mu.KotlinLogging
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.exception.InvalidMessageException
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.validation.MessageValidator
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.domain.Message
