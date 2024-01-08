@@ -1,13 +1,12 @@
 package org.gxf.standalonenotifyinggateway.coaphttpproxy.logging
 
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.http.HttpClient
-import org.gxf.standalonenotifyinggateway.coaphttpproxy.http.configuration.properties.HttpProperties
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
 
 @Component
-class RemoteLoggingWebClient(private val httpProperties: HttpProperties, private val webClient: WebClient) {
+class RemoteLoggingWebClient(private val webClient: WebClient) {
 
     fun remoteLogMessage(message: String) {
         executeErrorRequest(message)
@@ -20,6 +19,6 @@ class RemoteLoggingWebClient(private val httpProperties: HttpProperties, private
                 .bodyValue(body)
                 .retrieve()
                 .bodyToMono<Unit>()
-                .block(httpProperties.responseTimeout)
+                .subscribe()
     }
 }
