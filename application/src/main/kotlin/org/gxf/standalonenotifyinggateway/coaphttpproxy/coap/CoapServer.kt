@@ -4,7 +4,7 @@
 
 package org.gxf.standalonenotifyinggateway.coaphttpproxy.coap
 
-import mu.KotlinLogging
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.eclipse.californium.core.network.CoapEndpoint
 import org.eclipse.californium.elements.config.Configuration
 import org.springframework.stereotype.Component

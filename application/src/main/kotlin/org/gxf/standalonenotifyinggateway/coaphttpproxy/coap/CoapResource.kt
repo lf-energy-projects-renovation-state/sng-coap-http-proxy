@@ -4,7 +4,7 @@
 
 package org.gxf.standalonenotifyinggateway.coaphttpproxy.coap
 
-import mu.KotlinLogging
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.eclipse.californium.core.coap.CoAP.ResponseCode
 import org.eclipse.californium.core.server.resources.CoapExchange
 import org.eclipse.californium.elements.util.DatagramWriter

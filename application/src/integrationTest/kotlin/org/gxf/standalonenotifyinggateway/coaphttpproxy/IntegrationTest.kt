@@ -12,6 +12,7 @@ import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.http.Fault
 import org.assertj.core.api.Assertions.assertThat
+import org.awaitility.Awaitility
 import org.eclipse.californium.core.coap.CoAP
 import org.eclipse.californium.core.coap.MediaTypeRegistry
 import org.eclipse.californium.core.coap.Request
@@ -19,6 +20,7 @@ import org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.configuration.prope
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.http.HttpClient
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.http.configuration.properties.HttpProperties
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -26,6 +28,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
 import java.net.URL
+import java.time.Duration
 
 @Import(IntegrationTestCoapClient::class)
 @EnableConfigurationProperties(PskStubProperties::class, HttpProperties::class)
@@ -83,10 +86,11 @@ class IntegrationTest {
 
         coapClient.advanced(request)
 
-        val wiremockRequests = wiremock.findAll(postRequestedFor(urlPathTemplate("${HttpClient.MESSAGE_PATH}/{id}")))
-
-        assertThat(wiremockRequests).hasSize(1)
-        assertThat(ObjectMapper().readTree(wiremockRequests.first().bodyAsString)).isEqualTo(jsonNode)
+        Awaitility.await().atMost(Duration.ofSeconds(5)).untilAsserted {
+            val wiremockRequests = wiremock.findAll(postRequestedFor(urlPathTemplate("${HttpClient.MESSAGE_PATH}/{id}")))
+            assertThat(wiremockRequests).hasSize(1)
+            assertThat(ObjectMapper().readTree(wiremockRequests.first().bodyAsString)).isEqualTo(jsonNode)
+        }
     }
 
     // When a error occurs should not forward the coap message to the next service
@@ -106,12 +110,14 @@ class IntegrationTest {
 
         val response = coapClient.advanced(request)
 
-        val wiremockRequestsSng = wiremock.findAll(postRequestedFor(urlPathTemplate("${HttpClient.MESSAGE_PATH}/{id}")))
-        val wiremockRequestsError = wiremock.findAll(postRequestedFor(urlPathTemplate(HttpClient.ERROR_PATH)))
+        Awaitility.await().atMost(Duration.ofSeconds(5)).untilAsserted {
+            val wiremockRequestsSng = wiremock.findAll(postRequestedFor(urlPathTemplate("${HttpClient.MESSAGE_PATH}/{id}")))
+            val wiremockRequestsError = wiremock.findAll(postRequestedFor(urlPathTemplate(HttpClient.ERROR_PATH)))
 
-        assertThat(wiremockRequestsSng).hasSize(0)
-        assertThat(wiremockRequestsError).hasSize(1)
-        assertThat(response.code).isEqualTo(CoAP.ResponseCode.BAD_GATEWAY)
+            assertThat(wiremockRequestsSng).hasSize(0)
+            assertThat(wiremockRequestsError).hasSize(1)
+            assertThat(response.code).isEqualTo(CoAP.ResponseCode.BAD_GATEWAY)
+        }
     }
 
     @Test
@@ -128,12 +134,14 @@ class IntegrationTest {
 
         val response = coapClient.advanced(request)
 
-        val wiremockRequests = wiremock.findAll(postRequestedFor(urlPathTemplate("${HttpClient.MESSAGE_PATH}/{id}")))
-        val wiremockRequestsErrorEndpoint = wiremock.findAll(postRequestedFor(urlPathEqualTo(HttpClient.ERROR_PATH)))
+        Awaitility.await().atMost(Duration.ofSeconds(5)).untilAsserted {
+            val wiremockRequests = wiremock.findAll(postRequestedFor(urlPathTemplate("${HttpClient.MESSAGE_PATH}/{id}")))
+            val wiremockRequestsErrorEndpoint = wiremock.findAll(postRequestedFor(urlPathEqualTo(HttpClient.ERROR_PATH)))
 
+            assertThat(wiremockRequestsErrorEndpoint).hasSize(1)
+            assertThat(wiremockRequests).hasSize(1)
+            assertThat(response.code).isEqualTo(CoAP.ResponseCode.BAD_GATEWAY)
+        }
 
-        assertThat(wiremockRequestsErrorEndpoint).hasSize(1)
-        assertThat(wiremockRequests).hasSize(1)
-        assertThat(response.code).isEqualTo(CoAP.ResponseCode.BAD_GATEWAY)
     }
 }

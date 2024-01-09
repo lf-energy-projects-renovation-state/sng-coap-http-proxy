@@ -13,7 +13,7 @@ dependencies {
 
     runtimeOnly("io.micrometer:micrometer-registry-prometheus")
 
-    implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
+    implementation("io.github.oshai:kotlin-logging-jvm:6.0.1")
     implementation(kotlin("reflect"))
 
     implementation("org.eclipse.californium:californium-core:${rootProject.extra["californiumVersion"]}")
@@ -47,7 +47,7 @@ testing {
             useJUnitJupiter()
             dependencies {
                 implementation(project())
-                implementation("org.wiremock:wiremock:3.2.0")
+                implementation("org.wiremock:wiremock-standalone:3.3.1")
                 implementation("org.springframework.boot:spring-boot-starter-test")
                 implementation("org.mock-server:mockserver-spring-test-listener:${rootProject.extra["mockServerVersion"]}")
                 implementation("org.eclipse.californium:californium-core:${rootProject.extra["californiumVersion"]}")
