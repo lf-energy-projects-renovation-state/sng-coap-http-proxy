@@ -15,7 +15,7 @@ import org.eclipse.californium.scandium.MdcConnectionListener
 import org.eclipse.californium.scandium.config.DtlsConfig
 import org.eclipse.californium.scandium.config.DtlsConfig.DtlsRole
 import org.eclipse.californium.scandium.config.DtlsConnectorConfig
-import org.eclipse.californium.scandium.dtls.cipher.CipherSuite.TLS_PSK_WITH_AES_256_CCM_8
+import org.eclipse.californium.scandium.dtls.cipher.CipherSuite.TLS_PSK_WITH_AES_128_CBC_SHA256
 import org.eclipse.californium.scandium.dtls.pskstore.AdvancedPskStore
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.configuration.properties.CoapProperties
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.configuration.properties.UdpProperties
@@ -71,8 +71,8 @@ class CoapConfiguration(private val coapProps: CoapProperties, private val udpPr
     fun updateDtlsConfig(config: CaliforniumConfiguration) {
         config.set(DtlsConfig.DTLS_ROLE, DtlsRole.SERVER_ONLY)
                 .set(DtlsConfig.DTLS_RECOMMENDED_CIPHER_SUITES_ONLY, false)
-                .set(DtlsConfig.DTLS_PRESELECTED_CIPHER_SUITES, listOf(TLS_PSK_WITH_AES_256_CCM_8))
-                .set(DtlsConfig.DTLS_CIPHER_SUITES, listOf(TLS_PSK_WITH_AES_256_CCM_8))
+                .set(DtlsConfig.DTLS_PRESELECTED_CIPHER_SUITES, listOf(TLS_PSK_WITH_AES_128_CBC_SHA256))
+                .set(DtlsConfig.DTLS_CIPHER_SUITES, listOf(TLS_PSK_WITH_AES_128_CBC_SHA256))
                 .set(DtlsConfig.DTLS_CLIENT_AUTHENTICATION_MODE, CertificateAuthenticationMode.NONE)
     }
 
