@@ -32,7 +32,3 @@ config:
     udp-receive-buffer-size: 8192
     udp-send-buffer-size: 8192
     health-status-interval-in-seconds: 60
-
-  psk:
-    default-id: "867787050253370"
-    default-key: "ABCDEFGHIJKLMNOP"
