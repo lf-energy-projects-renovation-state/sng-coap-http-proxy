@@ -16,18 +16,17 @@ import org.awaitility.Awaitility
 import org.eclipse.californium.core.coap.CoAP
 import org.eclipse.californium.core.coap.MediaTypeRegistry
 import org.eclipse.californium.core.coap.Request
-import org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.configuration.properties.PskStubProperties
+import org.gxf.standalonenotifyinggateway.coaphttpproxy.configuration.PskStubProperties
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.http.HttpClient
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.http.configuration.properties.HttpProperties
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
-import java.net.URL
+import java.net.URI
 import java.time.Duration
 
 @Import(IntegrationTestCoapClient::class)
@@ -61,7 +60,7 @@ class IntegrationTest {
             }
             """)
 
-        val url = URL(httpProperties.url)
+        val url = URI(httpProperties.url).toURL()
         wiremock = WireMockServer(url.port)
         wiremock.stubFor(wiremockStubErrorEndpoint)
         wiremock.stubFor(wiremockStubOk)

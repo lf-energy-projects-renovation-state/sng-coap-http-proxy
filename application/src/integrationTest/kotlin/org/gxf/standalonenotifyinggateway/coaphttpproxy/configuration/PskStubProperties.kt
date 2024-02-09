@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-package org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.configuration.properties
+package org.gxf.standalonenotifyinggateway.coaphttpproxy.configuration
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 
