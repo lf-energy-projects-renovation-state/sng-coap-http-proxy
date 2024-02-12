@@ -40,3 +40,6 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Californium ###
+Californium3.properties
