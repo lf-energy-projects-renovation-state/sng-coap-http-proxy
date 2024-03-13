@@ -6,11 +6,11 @@ import io.spring.gradle.dependencymanagement.internal.dsl.StandardDependencyMana
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id("org.springframework.boot") version "3.2.1" apply false
+    id("org.springframework.boot") version "3.2.3" apply false
     id("io.spring.dependency-management") version "1.1.4" apply false
-    kotlin("jvm") version "1.9.22" apply false
-    kotlin("plugin.spring") version "1.9.22" apply false
-    kotlin("plugin.jpa") version "1.9.22" apply false
+    kotlin("jvm") version "1.9.23" apply false
+    kotlin("plugin.spring") version "1.9.23" apply false
+    kotlin("plugin.jpa") version "1.9.23" apply false
     id("com.github.davidmc24.gradle.plugin.avro") version "1.9.1" apply false
     id("org.sonarqube") version "4.4.1.3373"
     id("eclipse")

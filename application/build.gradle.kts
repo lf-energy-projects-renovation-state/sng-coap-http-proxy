@@ -19,6 +19,7 @@ dependencies {
     implementation("org.eclipse.californium:californium-core:${rootProject.extra["californiumVersion"]}")
     implementation("org.eclipse.californium:scandium:${rootProject.extra["californiumVersion"]}")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-cbor")
+    implementation("commons-codec:commons-codec:1.16.0")
 
     testImplementation("org.mockito:mockito-junit-jupiter")
     testImplementation("org.mockito.kotlin:mockito-kotlin:5.1.0")
