@@ -5,7 +5,7 @@
 package org.gxf.standalonenotifyinggateway.coaphttpproxy.coap
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import jakarta.xml.bind.DatatypeConverter
+import org.apache.commons.codec.binary.Hex
 import org.eclipse.californium.core.coap.CoAP.ResponseCode
 import org.eclipse.californium.core.server.resources.CoapExchange
 import org.eclipse.californium.elements.util.DatagramWriter
@@ -32,7 +32,7 @@ class CoapResource(private val coapProps: CoapProperties, private val messageHan
         try {
             val deviceId = getIdFromRequestContext(coapExchange)
             logger.debug { "Device ID from request context: $deviceId" }
-            logger.debug { "Received CBOR: ${DatatypeConverter.printHexBinary(coapExchange.requestPayload)}" }
+            logger.debug { "Received CBOR: ${Hex.encodeHexString(coapExchange.requestPayload)}" }
             val response = messageHandler.handlePost(deviceId, coapExchange.requestPayload)
             // Intentional exception throwing when the response is null or when there is no body
             writeResponse(coapExchange, response.body!!)
