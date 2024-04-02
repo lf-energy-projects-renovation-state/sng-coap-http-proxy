@@ -11,8 +11,8 @@ import org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.validation.MessageV
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.domain.Message
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.http.HttpClient
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.logging.RemoteLogger
-import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
+import org.springframework.web.reactive.function.client.WebClient
 
 @Service
 class MessageHandler(private val httpClient: HttpClient, private val messageValidator: MessageValidator, private val remoteLogger: RemoteLogger) {
@@ -20,7 +20,7 @@ class MessageHandler(private val httpClient: HttpClient, private val messageVali
     private val logger = KotlinLogging.logger {}
     private val cborMapper = CBORMapper()
 
-    fun handlePost(id: String, payload: ByteArray): ResponseEntity<String> {
+    fun handlePost(id: String, payload: ByteArray): WebClient.RequestHeadersSpec<*> {
         val parsedJson = cborMapper.readTree(payload)
         val message = Message(id, parsedJson)
 
@@ -28,7 +28,7 @@ class MessageHandler(private val httpClient: HttpClient, private val messageVali
 
         if (messageValidator.isValid(message)) {
             val response = httpClient.postMessage(message)
-            logger.debug { "Handled post, got response: $response." }
+            logger.debug { "Handled post" }
             return response
         }
 
