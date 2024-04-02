@@ -6,16 +6,15 @@ package org.gxf.standalonenotifyinggateway.coaphttpproxy.coap
 
 import com.fasterxml.jackson.dataformat.cbor.databind.CBORMapper
 import io.github.oshai.kotlinlogging.KotlinLogging
-import org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.exception.EmptyResponseException
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.exception.InvalidMessageException
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.validation.MessageValidator
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.domain.Message
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.http.HttpClient
-import org.gxf.standalonenotifyinggateway.coaphttpproxy.http.exception.BadRequestException
-import org.gxf.standalonenotifyinggateway.coaphttpproxy.http.exception.InternalServerErrorException
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.logging.RemoteLogger
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
+import org.springframework.web.client.HttpClientErrorException
+import org.springframework.web.client.HttpServerErrorException
 
 @Service
 class MessageHandler(private val httpClient: HttpClient, private val messageValidator: MessageValidator, private val remoteLogger: RemoteLogger) {
@@ -24,10 +23,7 @@ class MessageHandler(private val httpClient: HttpClient, private val messageVali
     private val cborMapper = CBORMapper()
 
     @Throws(
-        BadRequestException::class,
-        InternalServerErrorException::class,
-        EmptyResponseException::class,
-        InvalidMessageException::class
+        HttpClientErrorException::class, HttpServerErrorException::class
     )
     fun handlePost(id: String, payload: ByteArray): ResponseEntity<String>? {
         val parsedJson = cborMapper.readTree(payload)
