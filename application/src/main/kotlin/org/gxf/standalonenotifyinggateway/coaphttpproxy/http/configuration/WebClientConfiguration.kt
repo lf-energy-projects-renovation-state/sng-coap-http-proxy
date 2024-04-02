@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
+import org.springframework.http.client.JdkClientHttpRequestFactory
 import org.springframework.web.client.RestClient
 
 @Configuration
@@ -17,6 +18,7 @@ class WebClientConfiguration(private val httpProps: HttpProperties) {
     @Bean
     fun webClient(webClientBuilder: RestClient.Builder, webClientSsl: RestClientSsl): RestClient =
         webClientBuilder
+            .requestFactory(requestFactory())
                 .baseUrl(httpProps.url)
                 .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
@@ -26,4 +28,9 @@ class WebClientConfiguration(private val httpProps: HttpProperties) {
                     }
                 }
                 .build()
+
+    private fun requestFactory() =
+        JdkClientHttpRequestFactory()
+            .apply { this.setReadTimeout(httpProps.connectionTimeout) }
+
 }
