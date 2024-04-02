@@ -46,7 +46,7 @@ class HttpClient(
 
         try {
             val response = executeRequest(id, payload.toString())
-            logger.debug { "Posted message with id $id, resulting reponse: $response" }
+            logger.debug { "Posted message with id $id, resulting response: $response" }
             if (response == null) {
                 remoteLogger.error { "Response body for device with Id: $id is null" }
                 throw EmptyResponseException("Response body for device with Id: $id is null")
