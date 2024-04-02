@@ -4,17 +4,20 @@
 
 package org.gxf.standalonenotifyinggateway.coaphttpproxy.http
 
+import com.fasterxml.jackson.databind.JsonNode
 import io.github.oshai.kotlinlogging.KotlinLogging
-import org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.exception.EmptyResponseException
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.domain.Message
-import org.gxf.standalonenotifyinggateway.coaphttpproxy.http.configuration.properties.HttpProperties
-import org.gxf.standalonenotifyinggateway.coaphttpproxy.logging.RemoteLogger
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Component
-import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.client.HttpClientErrorException
+import org.springframework.web.client.HttpServerErrorException
+import org.springframework.web.client.RestClient
+import org.springframework.web.client.toEntity
 
 @Component
-class HttpClient(private val httpProps: HttpProperties, private val webClient: WebClient, private val remoteLogger: RemoteLogger) {
+class HttpClient(
+    private val webClient: RestClient
+) {
 
     companion object {
         const val ERROR_PATH = "/error"
@@ -24,32 +27,33 @@ class HttpClient(private val httpProps: HttpProperties, private val webClient: W
 
     private val logger = KotlinLogging.logger { }
 
-    fun postMessage(message: Message): ResponseEntity<String> {
+    @Throws(HttpClientErrorException::class, HttpServerErrorException::class)
+    fun postMessage(message: Message): ResponseEntity<String>? {
         val (id, payload) = message
 
-        logger.debug { "Posting message with id $id, body: $payload" }
+        val urc = getUrcFromMessage(payload)
+        logger.debug { "Posting message with id $id, body: $payload and urc $urc" }
 
         try {
             val response = executeRequest(id, payload.toString())
-            logger.debug { "Posted message with id $id, resulting response: $response." }
-            if (response == null) {
-                remoteLogger.error { "Response body for device with Id: $id is null" }
-                throw EmptyResponseException("Response body for device with Id: $id is null")
-            }
+            logger.debug { "Posted message with id $id, resulting response: $response" }
             return response
         } catch (e: Exception) {
-            logger.error(e) { "Failure while posting message with id $id" }
+            logger.warn { "Error received while posting message with id $id and $urc" }
             throw e
         }
     }
 
-    private fun executeRequest(id: String, body: String): ResponseEntity<String>? {
-        return webClient
-                .post()
-                .uri("$MESSAGE_PATH/$id")
-                .bodyValue(body)
-                .retrieve()
-                .toEntity(String::class.java)
-                .block(httpProps.responseTimeout)
-    }
+    private fun getUrcFromMessage(body: JsonNode) = body["URC"]
+        .filter { it.isTextual }
+        .map { it.asText() }
+        .firstOrNull()
+
+    @Throws(HttpClientErrorException::class, HttpServerErrorException::class)
+    private fun executeRequest(id: String, body: String): ResponseEntity<String> = webClient
+            .post()
+            .uri("$MESSAGE_PATH/$id")
+        .body(body)
+        .retrieve()
+        .toEntity<String>()
 }

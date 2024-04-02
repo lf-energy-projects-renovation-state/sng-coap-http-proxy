@@ -15,14 +15,14 @@ import org.gxf.standalonenotifyinggateway.coaphttpproxy.http.HttpClient.Companio
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.logging.RemoteLogger
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Component
-import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.client.RestClient
 import java.net.InetSocketAddress
-import java.time.Duration
 import javax.crypto.SecretKey
 
 
 @Component
-class RemotePskStore(private val webClient: WebClient, private val remoteLogger: RemoteLogger) : AdvancedPskStore {
+class RemotePskStore(private val webClient: RestClient, private val remoteLogger: RemoteLogger) :
+    AdvancedPskStore {
 
     override fun hasEcdhePskSupported(): Boolean {
         return true
@@ -42,7 +42,7 @@ class RemotePskStore(private val webClient: WebClient, private val remoteLogger:
 
     private fun getSecretForIdentity(identity: String): SecretKey? {
         val response = getKeyForIdentity(identity)
-        val body = response?.body
+        val body = response.body
 
         if (body.isNullOrEmpty()) {
             remoteLogger.error { "No key in body for identity: $identity" }
@@ -52,7 +52,7 @@ class RemotePskStore(private val webClient: WebClient, private val remoteLogger:
         return SecretUtil.create(body.toByteArray(), PskSecretResult.ALGORITHM_PSK)
     }
 
-    private fun getKeyForIdentity(identity: String): ResponseEntity<String>? {
+    private fun getKeyForIdentity(identity: String): ResponseEntity<String> {
         try {
             return webClient
                     .get()
@@ -60,7 +60,6 @@ class RemotePskStore(private val webClient: WebClient, private val remoteLogger:
                     .header("x-device-identity", identity)
                     .retrieve()
                     .toEntity(String::class.java)
-                    .block(Duration.ofMillis(10000))
         } catch (e: Exception) {
             remoteLogger.error {
                 "Unknown exception thrown while retrieving the key for $identity, " +

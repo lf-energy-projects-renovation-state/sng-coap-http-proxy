@@ -10,10 +10,11 @@ import org.eclipse.californium.core.coap.CoAP.ResponseCode
 import org.eclipse.californium.core.server.resources.CoapExchange
 import org.eclipse.californium.elements.util.DatagramWriter
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.configuration.properties.CoapProperties
-import org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.exception.EmptyResponseException
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.exception.InvalidMessageException
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.logging.RemoteLogger
 import org.springframework.stereotype.Component
+import org.springframework.web.client.HttpClientErrorException
+import org.springframework.web.client.HttpServerErrorException
 import org.eclipse.californium.core.CoapResource as CaliforniumCoapResource
 
 @Component
@@ -35,10 +36,15 @@ class CoapResource(private val coapProps: CoapProperties, private val messageHan
             logger.debug { "Received CBOR: ${Hex.encodeHexString(coapExchange.requestPayload)}" }
             val response = messageHandler.handlePost(deviceId, coapExchange.requestPayload)
             // Intentional exception throwing when the response is null or when there is no body
-            writeResponse(coapExchange, response.body!!)
+            writeResponse(coapExchange, response?.body!!)
         } catch (e: Exception) {
+            logger.warn { "Error occurred while handling post to device service" }
             when (e) {
-                is EmptyResponseException -> handleHttpFailure(coapExchange)
+                is HttpClientErrorException -> handleError(coapExchange, ResponseCode.BAD_REQUEST)
+                is HttpServerErrorException -> handleError(
+                    coapExchange,
+                    ResponseCode.INTERNAL_SERVER_ERROR
+                )
                 is InvalidMessageException -> handleInvalidMessage(coapExchange)
                 else -> handleUnexpectedError(coapExchange, e)
             }
@@ -49,6 +55,7 @@ class CoapResource(private val coapProps: CoapProperties, private val messageHan
             coapExchange.advanced().currentRequest.sourceContext.peerIdentity.name
 
     private fun writeResponse(coapExchange: CoapExchange, body: String) {
+        logger.info { "Sending successful response" }
         coapExchange.setMaxAge(1)
 
         coapExchange.setETag(
@@ -60,6 +67,10 @@ class CoapResource(private val coapProps: CoapProperties, private val messageHan
         coapExchange.respond(ResponseCode.CONTENT, body)
     }
 
+    private fun handleError(coapExchange: CoapExchange, responseCode: ResponseCode) {
+        coapExchange.respond(responseCode)
+    }
+
     private fun handleUnexpectedError(coapExchange: CoapExchange, e: Exception) {
         remoteLogger.error(e) { "Unexpected error occurred" }
         coapExchange.respond(ResponseCode.BAD_GATEWAY)
@@ -67,9 +78,5 @@ class CoapResource(private val coapProps: CoapProperties, private val messageHan
 
     private fun handleInvalidMessage(coapExchange: CoapExchange) {
         coapExchange.respond(ResponseCode.BAD_GATEWAY)
-    }
-
-    private fun handleHttpFailure(coapExchange: CoapExchange) {
-        writeResponse(coapExchange, "0")
     }
 }
