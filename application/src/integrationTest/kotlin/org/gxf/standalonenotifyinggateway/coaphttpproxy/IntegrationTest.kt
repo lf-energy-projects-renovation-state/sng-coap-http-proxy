@@ -15,7 +15,9 @@ import com.github.tomakehurst.wiremock.client.WireMock.ok
 import com.github.tomakehurst.wiremock.client.WireMock.post
 import com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor
 import com.github.tomakehurst.wiremock.client.WireMock.serverError
+import com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo
 import com.github.tomakehurst.wiremock.client.WireMock.urlPathTemplate
+import com.github.tomakehurst.wiremock.http.Fault
 import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.Awaitility
 import org.eclipse.californium.core.coap.CoAP
@@ -51,6 +53,12 @@ class IntegrationTest {
     private lateinit var wiremock: WireMockServer
 
     private val wiremockStubOk = post(urlPathTemplate("${HttpClient.MESSAGE_PATH}/{id}")).willReturn(ok("0"))
+    private val wiremockStubError =
+        post(urlPathTemplate("${HttpClient.MESSAGE_PATH}/{id}")).willReturn(
+            aResponse().withFault(
+                Fault.EMPTY_RESPONSE
+            )
+        )
     private val wiremockStubInternalServerError =
         post(urlPathTemplate("${HttpClient.MESSAGE_PATH}/{id}")).willReturn(
             serverError()
@@ -78,6 +86,8 @@ class IntegrationTest {
         wiremock = WireMockServer(url.port)
         wiremock.stubFor(wiremockStubErrorEndpoint)
         wiremock.stubFor(wiremockStubPsk)
+        wiremock.stubFor(wiremockStubOk)
+        wiremock.start()
     }
 
     @AfterEach
@@ -87,9 +97,6 @@ class IntegrationTest {
 
     @Test
     fun shouldForwardCoapMessageToHttp() {
-        wiremock.stubFor(wiremockStubOk)
-        wiremock.start()
-
         val coapClient = coapClient.getClient()
 
         val request =
@@ -111,9 +118,6 @@ class IntegrationTest {
     // Instead it should call the error endpoint with the error
     @Test
     fun shouldNotForwardCoapMessageToHttpWhenTheIdsDontMatch() {
-        wiremock.stubFor(wiremockStubOk)
-        wiremock.start()
-
         val coapClient = coapClient.getClient()
 
         val jsonNodeWithInvalidId = (jsonNode as ObjectNode)
@@ -138,9 +142,8 @@ class IntegrationTest {
     }
 
     @Test
-    fun shouldForwardInternalServiceErrorToDeviceIfHttp500IsReceived() {
-        wiremock.stubFor(wiremockStubInternalServerError)
-        wiremock.start()
+    fun shouldReturnBadGatewayWhenHttpClientReturnsUnexpectedError() {
+        wiremock.stubFor(wiremockStubError)
         val coapClient = coapClient.getClient()
 
         val request =
@@ -153,8 +156,36 @@ class IntegrationTest {
 
         Awaitility.await().atMost(Duration.ofSeconds(5)).untilAsserted {
             val wiremockRequests = wiremock.findAll(postRequestedFor(urlPathTemplate("${HttpClient.MESSAGE_PATH}/{id}")))
+            val wiremockRequestsErrorEndpoint =
+                wiremock.findAll(postRequestedFor(urlPathEqualTo(HttpClient.ERROR_PATH)))
+
+            assertThat(wiremockRequestsErrorEndpoint).hasSize(1)
+            assertThat(wiremockRequests).hasSize(1)
+            assertThat(response.code).isEqualTo(CoAP.ResponseCode.BAD_GATEWAY)
+        }
+    }
+
+    @Test
+    fun shouldForwardInternalServiceErrorToDeviceIfHttp500IsReceived() {
+        wiremock.stubFor(wiremockStubInternalServerError)
+        val coapClient = coapClient.getClient()
+
+        Awaitility.await().atMost(Duration.ofSeconds(5)).untilAsserted {
+            val wiremockRequests =
+                wiremock.findAll(postRequestedFor(urlPathTemplate("${HttpClient.MESSAGE_PATH}/{id}")))
+            val request = createRequest(jsonNode)
+            val response = coapClient.advanced(request)
             assertThat(wiremockRequests).hasSize(1)
             assertThat(response.code).isEqualTo(CoAP.ResponseCode.INTERNAL_SERVER_ERROR)
         }
+    }
+
+    private fun createRequest(jsonNode: JsonNode): Request {
+        val payload = CBORMapper().writeValueAsBytes(jsonNode)
+
+        return Request.newPost()
+            .apply {
+                options.setContentFormat(MediaTypeRegistry.APPLICATION_CBOR)
+            }.setPayload(payload)
     }
 }

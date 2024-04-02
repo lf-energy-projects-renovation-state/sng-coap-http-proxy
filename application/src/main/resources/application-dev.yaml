@@ -26,6 +26,7 @@ config:
   http:
     url: "http://localhost:9000"
     connection-timeout: 5000ms
+    response-timeout: 5000ms
 
   udp:
     udp-receive-buffer-size: 8192
