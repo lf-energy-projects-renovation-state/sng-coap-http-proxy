@@ -10,6 +10,7 @@ import org.eclipse.californium.core.coap.CoAP.ResponseCode
 import org.eclipse.californium.core.server.resources.CoapExchange
 import org.eclipse.californium.elements.util.DatagramWriter
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.configuration.properties.CoapProperties
+import org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.exception.CoapExchangeException
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.exception.InvalidMessageException
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.logging.RemoteLogger
 import org.springframework.stereotype.Component
@@ -32,6 +33,9 @@ class CoapResource(private val coapProps: CoapProperties, private val messageHan
         logger.debug { "Handling CoAP POST: $coapExchange for device $deviceId" }
         try {
             logger.debug { "Received CBOR: ${Hex.encodeHexString(coapExchange.requestPayload)}" }
+            if (deviceId == null) {
+                throw CoapExchangeException("Device id from coap exchange is null")
+            }
             val response = messageHandler.handlePost(deviceId, coapExchange.requestPayload)
             // Intentional exception throwing when the response is null or when there is no body
             writeResponse(coapExchange, response?.body!!)
@@ -49,8 +53,14 @@ class CoapResource(private val coapProps: CoapProperties, private val messageHan
         }
     }
 
-    private fun getIdFromRequestContext(coapExchange: CoapExchange) =
-            coapExchange.advanced().currentRequest.sourceContext.peerIdentity.name
+    private fun getIdFromRequestContext(coapExchange: CoapExchange): String? {
+        try {
+            return coapExchange.advanced().currentRequest.sourceContext.peerIdentity.name
+        } catch (e: Exception) {
+            logger.error(e) { "Error occurred while retrieving deviceId from coap exchange" }
+            return null
+        }
+    }
 
     private fun writeResponse(coapExchange: CoapExchange, body: String) {
         logger.info { "Sending successful response for device ${getIdFromRequestContext(coapExchange)}" }
