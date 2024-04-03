@@ -53,8 +53,7 @@ class CoapResource(private val coapProps: CoapProperties, private val messageHan
             coapExchange.advanced().currentRequest.sourceContext.peerIdentity.name
 
     private fun writeResponse(coapExchange: CoapExchange, body: String) {
-        val deviceId = getIdFromRequestContext(coapExchange)
-        logger.info { "Sending successful response for device $deviceId" }
+        logger.info { "Sending successful response for device ${getIdFromRequestContext(coapExchange)}" }
         coapExchange.setMaxAge(1)
 
         coapExchange.setETag(
