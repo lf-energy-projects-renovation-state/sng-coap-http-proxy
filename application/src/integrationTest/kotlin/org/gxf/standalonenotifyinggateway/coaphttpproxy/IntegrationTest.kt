@@ -1,7 +1,6 @@
 // SPDX-FileCopyrightText: Contributors to the GXF project
 //
 // SPDX-License-Identifier: Apache-2.0
-
 package org.gxf.standalonenotifyinggateway.coaphttpproxy
 
 import com.fasterxml.jackson.databind.JsonNode
@@ -9,7 +8,13 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.dataformat.cbor.databind.CBORMapper
 import com.github.tomakehurst.wiremock.WireMockServer
-import com.github.tomakehurst.wiremock.client.WireMock.*
+import com.github.tomakehurst.wiremock.client.WireMock.aResponse
+import com.github.tomakehurst.wiremock.client.WireMock.get
+import com.github.tomakehurst.wiremock.client.WireMock.ok
+import com.github.tomakehurst.wiremock.client.WireMock.post
+import com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor
+import com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo
+import com.github.tomakehurst.wiremock.client.WireMock.urlPathTemplate
 import com.github.tomakehurst.wiremock.http.Fault
 import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.Awaitility
@@ -34,113 +39,119 @@ import java.time.Duration
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class IntegrationTest {
 
-    @Autowired
-    private lateinit var coapClient: IntegrationTestCoapClient
+  @Autowired private lateinit var coapClient: IntegrationTestCoapClient
 
-    @Autowired
-    private lateinit var pskStubProperties: PskStubProperties
+  @Autowired private lateinit var pskStubProperties: PskStubProperties
 
-    @Autowired
-    private lateinit var httpProperties: HttpProperties
+  @Autowired private lateinit var httpProperties: HttpProperties
 
-    private lateinit var wiremock: WireMockServer
+  private lateinit var wiremock: WireMockServer
 
-    private val wiremockStubOk = post(urlPathTemplate("${HttpClient.MESSAGE_PATH}/{id}")).willReturn(ok("0"))
-    private val wiremockStubError = post(urlPathTemplate("${HttpClient.MESSAGE_PATH}/{id}")).willReturn(aResponse().withFault(Fault.EMPTY_RESPONSE))
-    private val wiremockStubErrorEndpoint = post(urlPathTemplate(HttpClient.ERROR_PATH)).willReturn(aResponse().withStatus(200))
-    private lateinit var jsonNode: JsonNode
+  private val wiremockStubOk =
+      post(urlPathTemplate("${HttpClient.MESSAGE_PATH}/{id}")).willReturn(ok("0"))
+  private val wiremockStubError =
+      post(urlPathTemplate("${HttpClient.MESSAGE_PATH}/{id}"))
+          .willReturn(aResponse().withFault(Fault.EMPTY_RESPONSE))
+  private val wiremockStubErrorEndpoint =
+      post(urlPathTemplate(HttpClient.ERROR_PATH)).willReturn(aResponse().withStatus(200))
+  private lateinit var jsonNode: JsonNode
 
-    @BeforeEach
-    fun beforeEach() {
-        val wiremockStubPsk = get(urlPathTemplate(HttpClient.PSK_PATH)).willReturn(ok(pskStubProperties.defaultKey))
+  @BeforeEach
+  fun beforeEach() {
+    val wiremockStubPsk =
+        get(urlPathTemplate(HttpClient.PSK_PATH)).willReturn(ok(pskStubProperties.defaultKey))
 
-        jsonNode = ObjectMapper().readTree(""" 
+    jsonNode =
+        ObjectMapper()
+            .readTree(
+                """ 
             {
                 "ID": "${pskStubProperties.defaultId}"
             }
             """)
 
-        val url = URI(httpProperties.url).toURL()
-        wiremock = WireMockServer(url.port)
-        wiremock.stubFor(wiremockStubErrorEndpoint)
-        wiremock.stubFor(wiremockStubOk)
-        wiremock.stubFor(wiremockStubPsk)
-        wiremock.start()
+    val url = URI(httpProperties.url).toURL()
+    wiremock = WireMockServer(url.port)
+    wiremock.stubFor(wiremockStubErrorEndpoint)
+    wiremock.stubFor(wiremockStubOk)
+    wiremock.stubFor(wiremockStubPsk)
+    wiremock.start()
+  }
+
+  @AfterEach
+  fun afterEach() {
+    wiremock.stop()
+  }
+
+  @Test
+  fun shouldForwardCoapMessageToHttp() {
+    val coapClient = coapClient.getClient()
+
+    val request =
+        Request.newPost()
+            .apply { options.setContentFormat(MediaTypeRegistry.APPLICATION_CBOR) }
+            .setPayload(CBORMapper().writeValueAsBytes(jsonNode))
+
+    coapClient.advanced(request)
+
+    Awaitility.await().atMost(Duration.ofSeconds(5)).untilAsserted {
+      val wiremockRequests =
+          wiremock.findAll(postRequestedFor(urlPathTemplate("${HttpClient.MESSAGE_PATH}/{id}")))
+      assertThat(wiremockRequests).hasSize(1)
+      assertThat(ObjectMapper().readTree(wiremockRequests.first().bodyAsString)).isEqualTo(jsonNode)
     }
+  }
 
-    @AfterEach
-    fun afterEach() {
-        wiremock.stop()
+  // When a error occurs should not forward the coap message to the next service
+  // Instead it should call the error endpoint with the error
+  @Test
+  fun shouldNotForwardCoapMessageToHttpWhenTheIdsDontMatch() {
+    val coapClient = coapClient.getClient()
+
+    val jsonNodeWithInvalidId =
+        (jsonNode as ObjectNode).put("ID", jsonNode.findValue("ID").asText().plus("1"))
+
+    val request =
+        Request.newPost()
+            .apply { options.setContentFormat(MediaTypeRegistry.APPLICATION_CBOR) }
+            .setPayload(CBORMapper().writeValueAsBytes(jsonNodeWithInvalidId))
+
+    val response = coapClient.advanced(request)
+
+    Awaitility.await().atMost(Duration.ofSeconds(5)).untilAsserted {
+      val wiremockRequestsSng =
+          wiremock.findAll(postRequestedFor(urlPathTemplate("${HttpClient.MESSAGE_PATH}/{id}")))
+      val wiremockRequestsError =
+          wiremock.findAll(postRequestedFor(urlPathTemplate(HttpClient.ERROR_PATH)))
+
+      assertThat(wiremockRequestsSng).hasSize(0)
+      assertThat(wiremockRequestsError).hasSize(1)
+      assertThat(response.code).isEqualTo(CoAP.ResponseCode.BAD_GATEWAY)
     }
+  }
 
-    @Test
-    fun shouldForwardCoapMessageToHttp() {
-        val coapClient = coapClient.getClient()
+  @Test
+  fun shouldReturnBadGatewayWhenHttpClientReturnsUnexpectedError() {
+    wiremock.stubFor(wiremockStubError)
 
-        val request =
-                Request.newPost()
-                        .apply {
-                            options.setContentFormat(MediaTypeRegistry.APPLICATION_CBOR)
-                        }.setPayload(CBORMapper().writeValueAsBytes(jsonNode))
+    val coapClient = coapClient.getClient()
 
-        coapClient.advanced(request)
+    val request =
+        Request.newPost()
+            .apply { options.setContentFormat(MediaTypeRegistry.APPLICATION_CBOR) }
+            .setPayload(CBORMapper().writeValueAsBytes(jsonNode))
 
-        Awaitility.await().atMost(Duration.ofSeconds(5)).untilAsserted {
-            val wiremockRequests = wiremock.findAll(postRequestedFor(urlPathTemplate("${HttpClient.MESSAGE_PATH}/{id}")))
-            assertThat(wiremockRequests).hasSize(1)
-            assertThat(ObjectMapper().readTree(wiremockRequests.first().bodyAsString)).isEqualTo(jsonNode)
-        }
+    val response = coapClient.advanced(request)
+
+    Awaitility.await().atMost(Duration.ofSeconds(5)).untilAsserted {
+      val wiremockRequests =
+          wiremock.findAll(postRequestedFor(urlPathTemplate("${HttpClient.MESSAGE_PATH}/{id}")))
+      val wiremockRequestsErrorEndpoint =
+          wiremock.findAll(postRequestedFor(urlPathEqualTo(HttpClient.ERROR_PATH)))
+
+      assertThat(wiremockRequestsErrorEndpoint).hasSize(1)
+      assertThat(wiremockRequests).hasSize(1)
+      assertThat(response.code).isEqualTo(CoAP.ResponseCode.BAD_GATEWAY)
     }
-
-    // When a error occurs should not forward the coap message to the next service
-    // Instead it should call the error endpoint with the error
-    @Test
-    fun shouldNotForwardCoapMessageToHttpWhenTheIdsDontMatch() {
-        val coapClient = coapClient.getClient()
-
-        val jsonNodeWithInvalidId = (jsonNode as ObjectNode)
-                .put("ID", jsonNode.findValue("ID").asText().plus("1"))
-
-        val request =
-                Request.newPost()
-                        .apply {
-                            options.setContentFormat(MediaTypeRegistry.APPLICATION_CBOR)
-                        }.setPayload(CBORMapper().writeValueAsBytes(jsonNodeWithInvalidId))
-
-        val response = coapClient.advanced(request)
-
-        Awaitility.await().atMost(Duration.ofSeconds(5)).untilAsserted {
-            val wiremockRequestsSng = wiremock.findAll(postRequestedFor(urlPathTemplate("${HttpClient.MESSAGE_PATH}/{id}")))
-            val wiremockRequestsError = wiremock.findAll(postRequestedFor(urlPathTemplate(HttpClient.ERROR_PATH)))
-
-            assertThat(wiremockRequestsSng).hasSize(0)
-            assertThat(wiremockRequestsError).hasSize(1)
-            assertThat(response.code).isEqualTo(CoAP.ResponseCode.BAD_GATEWAY)
-        }
-    }
-
-    @Test
-    fun shouldReturnBadGatewayWhenHttpClientReturnsUnexpectedError() {
-        wiremock.stubFor(wiremockStubError)
-
-        val coapClient = coapClient.getClient()
-
-        val request =
-                Request.newPost()
-                        .apply {
-                            options.setContentFormat(MediaTypeRegistry.APPLICATION_CBOR)
-                        }.setPayload(CBORMapper().writeValueAsBytes(jsonNode))
-
-        val response = coapClient.advanced(request)
-
-        Awaitility.await().atMost(Duration.ofSeconds(5)).untilAsserted {
-            val wiremockRequests = wiremock.findAll(postRequestedFor(urlPathTemplate("${HttpClient.MESSAGE_PATH}/{id}")))
-            val wiremockRequestsErrorEndpoint = wiremock.findAll(postRequestedFor(urlPathEqualTo(HttpClient.ERROR_PATH)))
-
-            assertThat(wiremockRequestsErrorEndpoint).hasSize(1)
-            assertThat(wiremockRequests).hasSize(1)
-            assertThat(response.code).isEqualTo(CoAP.ResponseCode.BAD_GATEWAY)
-        }
-
-    }
+  }
 }
