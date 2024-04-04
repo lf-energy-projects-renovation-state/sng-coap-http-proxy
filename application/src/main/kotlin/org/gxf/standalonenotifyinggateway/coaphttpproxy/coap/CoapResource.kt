@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: Contributors to the GXF project
 //
 // SPDX-License-Identifier: Apache-2.0
+
 package org.gxf.standalonenotifyinggateway.coaphttpproxy.coap
 
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -15,57 +16,58 @@ import org.springframework.stereotype.Component
 import org.eclipse.californium.core.CoapResource as CaliforniumCoapResource
 
 @Component
-class CoapResource(
-    private val coapProps: CoapProperties,
-    private val messageHandler: MessageHandler,
-    private val remoteLogger: RemoteLogger
-) : CaliforniumCoapResource(coapProps.path) {
+class CoapResource(private val coapProps: CoapProperties, private val messageHandler: MessageHandler, private val remoteLogger: RemoteLogger) :
+        CaliforniumCoapResource(coapProps.path) {
 
-  private val logger = KotlinLogging.logger {}
+    private val logger = KotlinLogging.logger { }
 
-  init {
-    logger.info { "Initializing Coap resource for path: ${coapProps.path}" }
-  }
-
-  override fun handlePOST(coapExchange: CoapExchange) {
-    logger.debug { "Handling CoAP POST: $coapExchange" }
-
-    try {
-      val deviceId = getIdFromRequestContext(coapExchange)
-      logger.debug { "Device ID from request context: $deviceId" }
-      val response = messageHandler.handlePost(deviceId, coapExchange.requestPayload)
-      // Intentional exception throwing when the response is null or when there is no body
-      writeResponse(coapExchange, response.body!!)
-    } catch (e: Exception) {
-      when (e) {
-        is EmptyResponseException -> handleHttpFailure(coapExchange)
-        is InvalidMessageException -> handleInvalidMessage(coapExchange)
-        else -> handleUnexpectedError(coapExchange, e)
-      }
+    init {
+        logger.info { "Initializing Coap resource for path: ${coapProps.path}" }
     }
-  }
 
-  private fun getIdFromRequestContext(coapExchange: CoapExchange) =
-      coapExchange.advanced().currentRequest.sourceContext.peerIdentity.name
+    override fun handlePOST(coapExchange: CoapExchange) {
+        logger.debug { "Handling CoAP POST: $coapExchange" }
 
-  private fun writeResponse(coapExchange: CoapExchange, body: String) {
-    coapExchange.setMaxAge(1)
+        try {
+            val deviceId = getIdFromRequestContext(coapExchange)
+            logger.debug { "Device ID from request context: $deviceId" }
+            val response = messageHandler.handlePost(deviceId, coapExchange.requestPayload)
+            // Intentional exception throwing when the response is null or when there is no body
+            writeResponse(coapExchange, response.body!!)
+        } catch (e: Exception) {
+            when (e) {
+                is EmptyResponseException -> handleHttpFailure(coapExchange)
+                is InvalidMessageException -> handleInvalidMessage(coapExchange)
+                else -> handleUnexpectedError(coapExchange, e)
+            }
+        }
+    }
 
-    coapExchange.setETag(DatagramWriter(4).apply { write(body.hashCode(), 32) }.toByteArray())
+    private fun getIdFromRequestContext(coapExchange: CoapExchange) =
+            coapExchange.advanced().currentRequest.sourceContext.peerIdentity.name
 
-    coapExchange.respond(ResponseCode.CONTENT, body)
-  }
+    private fun writeResponse(coapExchange: CoapExchange, body: String) {
+        coapExchange.setMaxAge(1)
 
-  private fun handleUnexpectedError(coapExchange: CoapExchange, e: Exception) {
-    remoteLogger.error(e) { "Unexpected error occurred" }
-    coapExchange.respond(ResponseCode.BAD_GATEWAY)
-  }
+        coapExchange.setETag(
+                DatagramWriter(4)
+                        .apply { write(body.hashCode(), 32) }
+                        .toByteArray()
+        )
 
-  private fun handleInvalidMessage(coapExchange: CoapExchange) {
-    coapExchange.respond(ResponseCode.BAD_GATEWAY)
-  }
+        coapExchange.respond(ResponseCode.CONTENT, body)
+    }
 
-  private fun handleHttpFailure(coapExchange: CoapExchange) {
-    writeResponse(coapExchange, "0")
-  }
+    private fun handleUnexpectedError(coapExchange: CoapExchange, e: Exception) {
+        remoteLogger.error(e) { "Unexpected error occurred" }
+        coapExchange.respond(ResponseCode.BAD_GATEWAY)
+    }
+
+    private fun handleInvalidMessage(coapExchange: CoapExchange) {
+        coapExchange.respond(ResponseCode.BAD_GATEWAY)
+    }
+
+    private fun handleHttpFailure(coapExchange: CoapExchange) {
+        writeResponse(coapExchange, "0")
+    }
 }
