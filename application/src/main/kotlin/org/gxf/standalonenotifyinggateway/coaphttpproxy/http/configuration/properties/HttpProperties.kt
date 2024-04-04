@@ -11,6 +11,5 @@ import java.time.Duration
 data class HttpProperties(
         val url: String,
         val sslBundle: String?,
-        val connectionTimeout: Duration,
-        val responseTimeout: Duration
+        val connectionTimeout: Duration
 )
