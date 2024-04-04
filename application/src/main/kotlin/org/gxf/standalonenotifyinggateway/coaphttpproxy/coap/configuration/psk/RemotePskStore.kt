@@ -3,6 +3,8 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.configuration.psk
 
+import java.net.InetSocketAddress
+import javax.crypto.SecretKey
 import org.eclipse.californium.scandium.dtls.ConnectionId
 import org.eclipse.californium.scandium.dtls.HandshakeResultHandler
 import org.eclipse.californium.scandium.dtls.PskPublicInformation
@@ -15,8 +17,6 @@ import org.gxf.standalonenotifyinggateway.coaphttpproxy.logging.RemoteLogger
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
-import java.net.InetSocketAddress
-import javax.crypto.SecretKey
 
 @Component
 class RemotePskStore(private val webClient: RestClient, private val remoteLogger: RemoteLogger) :

@@ -3,9 +3,12 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.configuration
 
+import java.net.InetSocketAddress
+import java.util.concurrent.TimeUnit
 import org.eclipse.californium.core.config.CoapConfig
 import org.eclipse.californium.core.network.CoapEndpoint
 import org.eclipse.californium.elements.config.CertificateAuthenticationMode
+import org.eclipse.californium.elements.config.Configuration as CaliforniumConfiguration
 import org.eclipse.californium.elements.config.SystemConfig
 import org.eclipse.californium.elements.config.TcpConfig
 import org.eclipse.californium.elements.config.UdpConfig
@@ -19,9 +22,6 @@ import org.eclipse.californium.scandium.dtls.pskstore.AdvancedPskStore
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.configuration.properties.CoapProperties
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.configuration.properties.UdpProperties
 import org.springframework.context.annotation.Bean
-import java.net.InetSocketAddress
-import java.util.concurrent.TimeUnit
-import org.eclipse.californium.elements.config.Configuration as CaliforniumConfiguration
 import org.springframework.context.annotation.Configuration as SpringConfiguration
 
 @SpringConfiguration

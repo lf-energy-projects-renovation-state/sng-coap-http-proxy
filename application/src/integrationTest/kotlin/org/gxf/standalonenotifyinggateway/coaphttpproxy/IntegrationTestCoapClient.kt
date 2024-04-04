@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.standalonenotifyinggateway.coaphttpproxy
 
+import java.net.InetSocketAddress
 import org.eclipse.californium.core.CoapClient
 import org.eclipse.californium.core.config.CoapConfig
 import org.eclipse.californium.core.network.CoapEndpoint
@@ -18,7 +19,6 @@ import org.eclipse.californium.scandium.dtls.cipher.CipherSuite
 import org.eclipse.californium.scandium.dtls.pskstore.AdvancedSinglePskStore
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
-import java.net.InetSocketAddress
 
 @Component
 class IntegrationTestCoapClient {
