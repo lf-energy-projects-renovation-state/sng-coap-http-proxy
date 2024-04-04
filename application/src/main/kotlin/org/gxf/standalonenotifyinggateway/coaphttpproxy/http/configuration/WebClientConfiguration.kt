@@ -1,7 +1,6 @@
 // SPDX-FileCopyrightText: Contributors to the GXF project
 //
 // SPDX-License-Identifier: Apache-2.0
-
 package org.gxf.standalonenotifyinggateway.coaphttpproxy.http.configuration
 
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.http.configuration.properties.HttpProperties
@@ -15,22 +14,20 @@ import org.springframework.web.client.RestClient
 
 @Configuration
 class WebClientConfiguration(private val httpProps: HttpProperties) {
-    @Bean
-    fun webClient(webClientBuilder: RestClient.Builder, webClientSsl: RestClientSsl): RestClient =
-        webClientBuilder
-            .requestFactory(requestFactory())
-                .baseUrl(httpProps.url)
-                .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .apply {
-                    if (httpProps.sslBundle != null) {
-                        it.apply(webClientSsl.fromBundle(httpProps.sslBundle))
-                    }
-                }
-                .build()
+  @Bean
+  fun webClient(webClientBuilder: RestClient.Builder, webClientSsl: RestClientSsl): RestClient =
+      webClientBuilder
+          .requestFactory(requestFactory())
+          .baseUrl(httpProps.url)
+          .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+          .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+          .apply {
+            if (httpProps.sslBundle != null) {
+              it.apply(webClientSsl.fromBundle(httpProps.sslBundle))
+            }
+          }
+          .build()
 
-    private fun requestFactory() =
-        JdkClientHttpRequestFactory()
-            .apply { this.setReadTimeout(httpProps.connectionTimeout) }
-
+  private fun requestFactory() =
+      JdkClientHttpRequestFactory().apply { this.setReadTimeout(httpProps.connectionTimeout) }
 }
