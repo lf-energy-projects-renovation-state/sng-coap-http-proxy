@@ -4,6 +4,7 @@
 
 package org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.configuration.psk
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.eclipse.californium.scandium.dtls.ConnectionId
 import org.eclipse.californium.scandium.dtls.HandshakeResultHandler
 import org.eclipse.californium.scandium.dtls.PskPublicInformation
@@ -24,6 +25,8 @@ import javax.crypto.SecretKey
 class RemotePskStore(private val webClient: RestClient, private val remoteLogger: RemoteLogger) :
     AdvancedPskStore {
 
+    val logger = KotlinLogging.logger {  }
+
     override fun hasEcdhePskSupported(): Boolean {
         return true
     }
@@ -43,6 +46,9 @@ class RemotePskStore(private val webClient: RestClient, private val remoteLogger
     private fun getSecretForIdentity(identity: String): SecretKey? {
         val response = getKeyForIdentity(identity)
         val body = response.body
+
+        // TODO remove
+        logger.trace { "Received key for '${identity}' - '${body}'" }
 
         if (body.isNullOrEmpty()) {
             remoteLogger.error { "No key in body for identity: $identity" }
