@@ -28,10 +28,6 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
         with:
           dependency-graph: generate-and-submit
-      - name: Apply Spotless
-        run: ./gradlew spotlessApply
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Build with Gradle
         run: ./gradlew build integrationTest bootBuildImage
         env:
