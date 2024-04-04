@@ -57,7 +57,7 @@ subprojects {
   extensions.configure<SpotlessExtension> {
     kotlin {
       // by default the target is every '.kt' and '.kts` file in the java source sets
-      ktfmt() // has its own section below
+      ktfmt()
       licenseHeader(
           """
                 // SPDX-FileCopyrightText: Contributors to the GXF project
