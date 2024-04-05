@@ -8,12 +8,12 @@ import org.springframework.stereotype.Service
 
 @Service
 class MessageValidator {
-  fun isValid(message: Message): Boolean {
-    val idValue = message.payload.findValue("ID")
-    if (idValue != null) {
-      val payloadId = idValue.asText()
-      return message.deviceId == payloadId
+    fun isValid(message: Message): Boolean {
+        val idValue = message.payload.findValue("ID")
+        if (idValue != null) {
+            val payloadId = idValue.asText()
+            return message.deviceId == payloadId
+        }
+        return false
     }
-    return false
-  }
 }

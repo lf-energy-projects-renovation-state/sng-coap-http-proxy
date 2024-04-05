@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.configuration.properties
 
-import java.time.Duration
 import org.springframework.boot.context.properties.ConfigurationProperties
+import java.time.Duration
 
 @ConfigurationProperties(prefix = "config.coap")
 class CoapProperties(
@@ -15,5 +15,5 @@ class CoapProperties(
     val maxMessageSize: Int,
     val maxPeerInactivityPeriod: Duration,
     val maxResourceBodySize: Int,
-    val preferredBlockSize: Int
+    val preferredBlockSize: Int,
 )
