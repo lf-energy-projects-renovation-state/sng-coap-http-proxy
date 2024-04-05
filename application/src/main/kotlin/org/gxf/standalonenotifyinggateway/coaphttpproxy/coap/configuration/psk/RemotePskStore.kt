@@ -21,6 +21,7 @@ import javax.crypto.SecretKey
 @Component
 class RemotePskStore(private val webClient: RestClient, private val remoteLogger: RemoteLogger) :
     AdvancedPskStore {
+
     override fun hasEcdhePskSupported(): Boolean {
         return true
     }
@@ -32,14 +33,14 @@ class RemotePskStore(private val webClient: RestClient, private val remoteLogger
         hmacAlgorithm: String?,
         otherSecret: SecretKey?,
         seed: ByteArray?,
-        useExtendedMasterSecret: Boolean,
+        useExtendedMasterSecret: Boolean
     ): PskSecretResult {
         return PskSecretResult(cid, identity, getSecretForIdentity(identity.publicInfoAsString))
     }
 
     override fun getIdentity(
         peerAddress: InetSocketAddress,
-        virtualHost: ServerNames?,
+        virtualHost: ServerNames?
     ): PskPublicInformation? {
         throw NotImplementedError("Method not implemented because it is not used")
     }
@@ -71,7 +72,7 @@ class RemotePskStore(private val webClient: RestClient, private val remoteLogger
         } catch (e: Exception) {
             remoteLogger.error {
                 "Unknown exception thrown while retrieving the key for $identity, " +
-                    "with exception ${e.message} and stacktrace ${e.stackTrace}"
+                        "with exception ${e.message} and stacktrace ${e.stackTrace}"
             }
             throw e
         }
