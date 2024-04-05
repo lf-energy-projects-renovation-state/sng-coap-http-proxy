@@ -4,7 +4,6 @@
 
 package org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.configuration.psk
 
-import io.github.oshai.kotlinlogging.KotlinLogging
 import org.eclipse.californium.scandium.dtls.ConnectionId
 import org.eclipse.californium.scandium.dtls.HandshakeResultHandler
 import org.eclipse.californium.scandium.dtls.PskPublicInformation
@@ -25,17 +24,26 @@ import javax.crypto.SecretKey
 class RemotePskStore(private val webClient: RestClient, private val remoteLogger: RemoteLogger) :
     AdvancedPskStore {
 
-    val logger = KotlinLogging.logger {  }
-
     override fun hasEcdhePskSupported(): Boolean {
         return true
     }
 
-    override fun requestPskSecretResult(cid: ConnectionId?, serverName: ServerNames?, identity: PskPublicInformation, hmacAlgorithm: String?, otherSecret: SecretKey?, seed: ByteArray?, useExtendedMasterSecret: Boolean): PskSecretResult {
+    override fun requestPskSecretResult(
+        cid: ConnectionId?,
+        serverName: ServerNames?,
+        identity: PskPublicInformation,
+        hmacAlgorithm: String?,
+        otherSecret: SecretKey?,
+        seed: ByteArray?,
+        useExtendedMasterSecret: Boolean
+    ): PskSecretResult {
         return PskSecretResult(cid, identity, getSecretForIdentity(identity.publicInfoAsString))
     }
 
-    override fun getIdentity(peerAddress: InetSocketAddress, virtualHost: ServerNames?): PskPublicInformation? {
+    override fun getIdentity(
+        peerAddress: InetSocketAddress,
+        virtualHost: ServerNames?
+    ): PskPublicInformation? {
         throw NotImplementedError("Method not implemented because it is not used")
     }
 
@@ -46,9 +54,6 @@ class RemotePskStore(private val webClient: RestClient, private val remoteLogger
     private fun getSecretForIdentity(identity: String): SecretKey? {
         val response = getKeyForIdentity(identity)
         val body = response.body
-
-        // TODO remove
-        logger.trace { "Received key for '${identity}' - '${body}'" }
 
         if (body.isNullOrEmpty()) {
             remoteLogger.error { "No key in body for identity: $identity" }
@@ -61,11 +66,11 @@ class RemotePskStore(private val webClient: RestClient, private val remoteLogger
     private fun getKeyForIdentity(identity: String): ResponseEntity<String> {
         try {
             return webClient
-                    .get()
-                    .uri(PSK_PATH)
-                    .header("x-device-identity", identity)
-                    .retrieve()
-                    .toEntity(String::class.java)
+                .get()
+                .uri(PSK_PATH)
+                .header("x-device-identity", identity)
+                .retrieve()
+                .toEntity(String::class.java)
         } catch (e: Exception) {
             remoteLogger.error {
                 "Unknown exception thrown while retrieving the key for $identity, " +
