@@ -66,7 +66,7 @@ subprojects {
 
                 """
                     .trimIndent(),
-                "package "
+                "package ",
             )
         }
     }

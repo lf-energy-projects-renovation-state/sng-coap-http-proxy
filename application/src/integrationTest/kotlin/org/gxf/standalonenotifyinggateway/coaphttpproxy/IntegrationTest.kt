@@ -104,7 +104,9 @@ class IntegrationTest {
         coapClient.advanced(request)
 
         Awaitility.await().atMost(Duration.ofSeconds(5)).untilAsserted {
-            val wiremockRequests = wiremock.findAll(postRequestedFor(urlPathTemplate("${HttpClient.MESSAGE_PATH}/{id}")))
+            val wiremockRequests = wiremock.findAll(
+                postRequestedFor(urlPathTemplate("${HttpClient.MESSAGE_PATH}/{id}")),
+            )
             assertThat(wiremockRequests).hasSize(1)
             assertThat(ObjectMapper().readTree(wiremockRequests.first().bodyAsString)).isEqualTo(jsonNode)
         }

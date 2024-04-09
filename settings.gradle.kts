@@ -5,4 +5,3 @@
 rootProject.name = "sng-coap-http-proxy"
 
 include("application")
-
