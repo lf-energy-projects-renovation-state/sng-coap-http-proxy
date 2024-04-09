@@ -21,26 +21,26 @@ class MessageHandler(
     private val messageValidator: MessageValidator,
     private val remoteLogger: RemoteLogger,
 ) {
-    private val logger = KotlinLogging.logger {}
-    private val cborMapper = CBORMapper()
+  private val logger = KotlinLogging.logger {}
+  private val cborMapper = CBORMapper()
 
-    @Throws(HttpClientErrorException::class, HttpServerErrorException::class)
-    fun handlePost(
-        id: String,
-        payload: ByteArray,
-    ): ResponseEntity<String>? {
-        val parsedJson = cborMapper.readTree(payload)
-        val message = Message(id, parsedJson)
+  @Throws(HttpClientErrorException::class, HttpServerErrorException::class)
+  fun handlePost(
+      id: String,
+      payload: ByteArray,
+  ): ResponseEntity<String>? {
+    val parsedJson = cborMapper.readTree(payload)
+    val message = Message(id, parsedJson)
 
-        logger.trace { "Handling post, for message: $message." }
+    logger.trace { "Handling post, for message: $message." }
 
-        if (messageValidator.isValid(message)) {
-            val response = httpClient.postMessage(message)
-            logger.debug { "Handled post" }
-            return response
-        }
-
-        remoteLogger.error { "Received invalid message: $message" }
-        throw InvalidMessageException("Received invalid message: $message")
+    if (messageValidator.isValid(message)) {
+      val response = httpClient.postMessage(message)
+      logger.debug { "Handled post" }
+      return response
     }
+
+    remoteLogger.error { "Received invalid message: $message" }
+    throw InvalidMessageException("Received invalid message: $message")
+  }
 }
