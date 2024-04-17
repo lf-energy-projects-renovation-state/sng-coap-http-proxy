@@ -37,7 +37,7 @@ class CoapConfiguration(private val coapProps: CoapProperties, private val udpPr
 
     @Bean
     fun serverConfiguration(): CaliforniumConfiguration =
-            CaliforniumConfiguration.getStandard()
+            CaliforniumConfiguration.createStandardWithoutFile()
                     .apply {
                         updateCoapConfigFromProperties(this)
                         updateUdpConfigFromProperties(this)
