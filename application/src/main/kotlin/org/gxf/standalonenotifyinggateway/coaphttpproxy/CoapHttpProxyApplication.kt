@@ -10,5 +10,5 @@ import org.springframework.boot.runApplication
 @SpringBootApplication @ConfigurationPropertiesScan class CoapHttpProxyApplication
 
 fun main(args: Array<String>) {
-  runApplication<CoapHttpProxyApplication>(*args)
+    runApplication<CoapHttpProxyApplication>(*args)
 }

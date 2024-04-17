@@ -25,38 +25,38 @@ import org.mockito.kotlin.check
 
 @ExtendWith(MockitoExtension::class)
 class MessageHandlerTest {
-  @Mock private lateinit var httpClient: HttpClient
+    @Mock private lateinit var httpClient: HttpClient
 
-  @Mock private lateinit var messageValidator: MessageValidator
+    @Mock private lateinit var messageValidator: MessageValidator
 
-  @Mock private lateinit var remoteLogger: RemoteLogger
+    @Mock private lateinit var remoteLogger: RemoteLogger
 
-  @InjectMocks private lateinit var messageHandler: MessageHandler
+    @InjectMocks private lateinit var messageHandler: MessageHandler
 
-  private val testJsonNode = ObjectMapper().readTree("{\"ID\": 12345}")
-  private val testCbor = CBORMapper().writeValueAsBytes(testJsonNode)
+    private val testJsonNode = ObjectMapper().readTree("{\"ID\": 12345}")
+    private val testCbor = CBORMapper().writeValueAsBytes(testJsonNode)
 
-  @Test
-  fun shouldCallRemoteLoggerWhenMessageIsInvalid() {
-    `when`(messageValidator.isValid(any<Message>())).thenReturn(false)
+    @Test
+    fun shouldCallRemoteLoggerWhenMessageIsInvalid() {
+        `when`(messageValidator.isValid(any<Message>())).thenReturn(false)
 
-    val thrownException = catchThrowable {
-      messageHandler.handlePost("12345", testCbor)
-      verify(remoteLogger).error(any())
+        val thrownException = catchThrowable {
+            messageHandler.handlePost("12345", testCbor)
+            verify(remoteLogger).error(any())
+        }
+
+        assertThat(thrownException).isInstanceOf(InvalidMessageException::class.java)
     }
 
-    assertThat(thrownException).isInstanceOf(InvalidMessageException::class.java)
-  }
+    @Test
+    fun callHttpClientWhenMessageIsValid() {
+        val message = Message("12345", testJsonNode)
 
-  @Test
-  fun callHttpClientWhenMessageIsValid() {
-    val message = Message("12345", testJsonNode)
+        `when`(messageValidator.isValid(any<Message>())).thenReturn(true)
 
-    `when`(messageValidator.isValid(any<Message>())).thenReturn(true)
+        messageHandler.handlePost("12345", testCbor)
 
-    messageHandler.handlePost("12345", testCbor)
-
-    verify(httpClient)
-        .postMessage(check { assertThat(it).usingRecursiveComparison().isEqualTo(message) })
-  }
+        verify(httpClient)
+            .postMessage(check { assertThat(it).usingRecursiveComparison().isEqualTo(message) })
+    }
 }
