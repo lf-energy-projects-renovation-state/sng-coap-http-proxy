@@ -29,16 +29,6 @@ sonar {
     }
 }
 
-extra["archUnitVersion"] = "1.1.0"
-
-extra["californiumVersion"] = "3.8.0"
-
-extra["kotlinLoggingJvmVersion"] = "3.0.5"
-
-extra["mockitoKotlinVersion"] = "5.1.0"
-
-extra["mockServerVersion"] = "5.15.0"
-
 subprojects {
     apply(plugin = "org.jetbrains.kotlin.jvm")
     apply(plugin = "org.jetbrains.kotlin.plugin.spring")

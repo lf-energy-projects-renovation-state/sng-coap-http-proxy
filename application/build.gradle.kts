@@ -9,20 +9,18 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
 
-    runtimeOnly("io.micrometer:micrometer-registry-prometheus")
-
-    implementation("io.github.oshai:kotlin-logging-jvm:6.0.1")
+    implementation(libs.kotlinLoggingJvm)
     implementation(kotlin("reflect"))
 
-    implementation(
-        "org.eclipse.californium:californium-core:${rootProject.extra["californiumVersion"]}",
-    )
-    implementation("org.eclipse.californium:scandium:${rootProject.extra["californiumVersion"]}")
+    implementation(libs.californiumCore)
+    implementation(libs.californiumScandium)
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-cbor")
-    implementation("commons-codec:commons-codec:1.16.0")
+    implementation(libs.commonsCodec)
+
+    runtimeOnly("io.micrometer:micrometer-registry-prometheus")
 
     testImplementation("org.mockito:mockito-junit-jupiter")
-    testImplementation("org.mockito.kotlin:mockito-kotlin:5.1.0")
+    testImplementation(libs.mockitoKotlin)
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 
     // Generate test and integration test reports
@@ -49,21 +47,13 @@ testing {
                 useJUnitJupiter()
                 dependencies {
                     implementation(project())
-                    implementation("org.wiremock:wiremock-standalone:3.3.1")
+                    implementation(libs.wiremock)
                     implementation("org.springframework.boot:spring-boot-starter-test")
-                    implementation(
-                        "org.mock-server:mockserver-spring-test-listener:${rootProject.extra["mockServerVersion"]}",
-                    )
-                    implementation(
-                        "org.eclipse.californium:californium-core:${rootProject.extra["californiumVersion"]}",
-                    )
-                    implementation(
-                        "org.eclipse.californium:scandium:${rootProject.extra["californiumVersion"]}",
-                    )
+                    implementation(libs.mockServer)
+                    implementation(libs.californiumCore)
+                    implementation(libs.californiumScandium)
                     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-cbor")
-                    implementation(
-                        "io.github.microutils:kotlin-logging-jvm:${rootProject.extra["kotlinLoggingJvmVersion"]}",
-                    )
+                    implementation(libs.kotlinLoggingJvm)
                 }
             }
     }
