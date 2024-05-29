@@ -1,9 +1,10 @@
 // SPDX-FileCopyrightText: Contributors to the GXF project
 //
 // SPDX-License-Identifier: Apache-2.0
-
 package org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.configuration.psk
 
+import java.net.InetSocketAddress
+import javax.crypto.SecretKey
 import org.eclipse.californium.scandium.dtls.ConnectionId
 import org.eclipse.californium.scandium.dtls.HandshakeResultHandler
 import org.eclipse.californium.scandium.dtls.PskPublicInformation
@@ -16,14 +17,10 @@ import org.gxf.standalonenotifyinggateway.coaphttpproxy.logging.RemoteLogger
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
-import java.net.InetSocketAddress
-import javax.crypto.SecretKey
-
 
 @Component
 class RemotePskStore(private val webClient: RestClient, private val remoteLogger: RemoteLogger) :
     AdvancedPskStore {
-
     override fun hasEcdhePskSupported(): Boolean {
         return true
     }
@@ -35,14 +32,14 @@ class RemotePskStore(private val webClient: RestClient, private val remoteLogger
         hmacAlgorithm: String?,
         otherSecret: SecretKey?,
         seed: ByteArray?,
-        useExtendedMasterSecret: Boolean
+        useExtendedMasterSecret: Boolean,
     ): PskSecretResult {
         return PskSecretResult(cid, identity, getSecretForIdentity(identity.publicInfoAsString))
     }
 
     override fun getIdentity(
         peerAddress: InetSocketAddress,
-        virtualHost: ServerNames?
+        virtualHost: ServerNames?,
     ): PskPublicInformation? {
         throw NotImplementedError("Method not implemented because it is not used")
     }
@@ -74,7 +71,7 @@ class RemotePskStore(private val webClient: RestClient, private val remoteLogger
         } catch (e: Exception) {
             remoteLogger.error {
                 "Unknown exception thrown while retrieving the key for $identity, " +
-                        "with exception ${e.message} and stacktrace ${e.stackTrace}"
+                    "with exception ${e.message} and stacktrace ${e.stackTrace}"
             }
             throw e
         }

@@ -1,7 +1,6 @@
 // SPDX-FileCopyrightText: Contributors to the GXF project
 //
 // SPDX-License-Identifier: Apache-2.0
-
 package org.gxf.standalonenotifyinggateway.coaphttpproxy
 
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -24,21 +23,15 @@ import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.check
 
-
 @ExtendWith(MockitoExtension::class)
 class MessageHandlerTest {
+    @Mock private lateinit var httpClient: HttpClient
 
-    @Mock
-    private lateinit var httpClient: HttpClient
+    @Mock private lateinit var messageValidator: MessageValidator
 
-    @Mock
-    private lateinit var messageValidator: MessageValidator
+    @Mock private lateinit var remoteLogger: RemoteLogger
 
-    @Mock
-    private lateinit var remoteLogger: RemoteLogger
-
-    @InjectMocks
-    private lateinit var messageHandler: MessageHandler
+    @InjectMocks private lateinit var messageHandler: MessageHandler
 
     private val testJsonNode = ObjectMapper().readTree("{\"ID\": 12345}")
     private val testCbor = CBORMapper().writeValueAsBytes(testJsonNode)
@@ -63,8 +56,7 @@ class MessageHandlerTest {
 
         messageHandler.handlePost("12345", testCbor)
 
-        verify(httpClient).postMessage(check {
-            assertThat(it).usingRecursiveComparison().isEqualTo(message)
-        })
+        verify(httpClient)
+            .postMessage(check { assertThat(it).usingRecursiveComparison().isEqualTo(message) })
     }
 }

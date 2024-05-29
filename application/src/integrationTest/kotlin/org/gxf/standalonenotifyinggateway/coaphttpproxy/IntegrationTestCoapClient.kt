@@ -1,9 +1,9 @@
 // SPDX-FileCopyrightText: Contributors to the GXF project
 //
 // SPDX-License-Identifier: Apache-2.0
-
 package org.gxf.standalonenotifyinggateway.coaphttpproxy
 
+import java.net.InetSocketAddress
 import org.eclipse.californium.core.CoapClient
 import org.eclipse.californium.core.config.CoapConfig
 import org.eclipse.californium.core.network.CoapEndpoint
@@ -19,22 +19,16 @@ import org.eclipse.californium.scandium.dtls.cipher.CipherSuite
 import org.eclipse.californium.scandium.dtls.pskstore.AdvancedSinglePskStore
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
-import java.net.InetSocketAddress
 
 @Component
 class IntegrationTestCoapClient {
+    @Value("\${config.coap.coaps-port}") private lateinit var coapsPort: Number
 
-    @Value("\${config.coap.coaps-port}")
-    private lateinit var coapsPort: Number
+    @Value("\${config.coap.path}") private lateinit var path: String
 
-    @Value("\${config.coap.path}")
-    private lateinit var path: String
+    @Value("\${config.psk.default-id}") private lateinit var defaultId: String
 
-    @Value("\${config.psk.default-id}")
-    private lateinit var defaultId: String
-
-    @Value("\${config.psk.default-key}")
-    private lateinit var defaultKey: String
+    @Value("\${config.psk.default-key}") private lateinit var defaultKey: String
 
     init {
         DtlsConfig.register()
@@ -47,7 +41,8 @@ class IntegrationTestCoapClient {
         val uri = this.getUri()
         val coapClient = CoapClient(uri)
         val dtlsConnector = this.createDtlsConnector()
-        val endpoint = CoapEndpoint.Builder()
+        val endpoint =
+            CoapEndpoint.Builder()
                 .setConfiguration(createConfiguration())
                 .setConnector(dtlsConnector)
                 .build()
@@ -57,19 +52,19 @@ class IntegrationTestCoapClient {
 
     private fun createConfiguration(): Configuration {
         return Configuration.getStandard()
-                .set(CoapConfig.COAP_SECURE_PORT, coapsPort.toInt())
-                .set(DtlsConfig.DTLS_ROLE, DtlsConfig.DtlsRole.CLIENT_ONLY)
-                .set(DtlsConfig.DTLS_CIPHER_SUITES, listOf(CipherSuite.TLS_PSK_WITH_AES_128_CBC_SHA256))
+            .set(CoapConfig.COAP_SECURE_PORT, coapsPort.toInt())
+            .set(DtlsConfig.DTLS_ROLE, DtlsConfig.DtlsRole.CLIENT_ONLY)
+            .set(DtlsConfig.DTLS_CIPHER_SUITES, listOf(CipherSuite.TLS_PSK_WITH_AES_128_CBC_SHA256))
     }
 
     private fun getUri(): String =
-            String.format("%s://%s:%d/%s", "coaps", "localhost", coapsPort.toInt(), path)
-
+        String.format("%s://%s:%d/%s", "coaps", "localhost", coapsPort.toInt(), path)
 
     private fun createDtlsConnector(): DTLSConnector {
         val address = InetSocketAddress(0)
         val pskStore = createPskStore()
-        val dtlsBuilder = DtlsConnectorConfig.builder(createConfiguration())
+        val dtlsBuilder =
+            DtlsConnectorConfig.builder(createConfiguration())
                 .setAddress(address)
                 .setAdvancedPskStore(pskStore)
                 .setConnectionListener(MdcConnectionListener())

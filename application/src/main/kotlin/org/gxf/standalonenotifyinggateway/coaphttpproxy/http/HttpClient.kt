@@ -1,7 +1,6 @@
 // SPDX-FileCopyrightText: Contributors to the GXF project
 //
 // SPDX-License-Identifier: Apache-2.0
-
 package org.gxf.standalonenotifyinggateway.coaphttpproxy.http
 
 import com.fasterxml.jackson.databind.JsonNode
@@ -15,17 +14,14 @@ import org.springframework.web.client.RestClient
 import org.springframework.web.client.toEntity
 
 @Component
-class HttpClient(
-    private val webClient: RestClient
-) {
-
+class HttpClient(private val webClient: RestClient) {
     companion object {
         const val ERROR_PATH = "/error"
         const val MESSAGE_PATH = "/sng"
         const val PSK_PATH = "/psk"
     }
 
-    private val logger = KotlinLogging.logger { }
+    private val logger = KotlinLogging.logger {}
 
     @Throws(HttpClientErrorException::class, HttpServerErrorException::class)
     fun postMessage(message: Message): ResponseEntity<String>? {
@@ -44,16 +40,13 @@ class HttpClient(
         }
     }
 
-    private fun getUrcFromMessage(body: JsonNode) = body["URC"]
-        .filter { it.isTextual }
-        .map { it.asText() }
-        .firstOrNull()
+    private fun getUrcFromMessage(body: JsonNode) =
+        body["URC"].filter { it.isTextual }.map { it.asText() }.firstOrNull()
 
     @Throws(HttpClientErrorException::class, HttpServerErrorException::class)
-    private fun executeRequest(id: String, body: String): ResponseEntity<String> = webClient
-            .post()
-            .uri("$MESSAGE_PATH/$id")
-        .body(body)
-        .retrieve()
-        .toEntity<String>()
+    private fun executeRequest(
+        id: String,
+        body: String,
+    ): ResponseEntity<String> =
+        webClient.post().uri("$MESSAGE_PATH/$id").body(body).retrieve().toEntity<String>()
 }

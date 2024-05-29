@@ -1,7 +1,6 @@
 // SPDX-FileCopyrightText: Contributors to the GXF project
 //
 // SPDX-License-Identifier: Apache-2.0
-
 package org.gxf.standalonenotifyinggateway.coaphttpproxy.coap
 
 import com.fasterxml.jackson.dataformat.cbor.databind.CBORMapper
@@ -17,15 +16,19 @@ import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.HttpServerErrorException
 
 @Service
-class MessageHandler(private val httpClient: HttpClient, private val messageValidator: MessageValidator, private val remoteLogger: RemoteLogger) {
-
+class MessageHandler(
+    private val httpClient: HttpClient,
+    private val messageValidator: MessageValidator,
+    private val remoteLogger: RemoteLogger,
+) {
     private val logger = KotlinLogging.logger {}
     private val cborMapper = CBORMapper()
 
-    @Throws(
-        HttpClientErrorException::class, HttpServerErrorException::class
-    )
-    fun handlePost(id: String, payload: ByteArray): ResponseEntity<String>? {
+    @Throws(HttpClientErrorException::class, HttpServerErrorException::class)
+    fun handlePost(
+        id: String,
+        payload: ByteArray,
+    ): ResponseEntity<String>? {
         val parsedJson = cborMapper.readTree(payload)
         val message = Message(id, parsedJson)
 

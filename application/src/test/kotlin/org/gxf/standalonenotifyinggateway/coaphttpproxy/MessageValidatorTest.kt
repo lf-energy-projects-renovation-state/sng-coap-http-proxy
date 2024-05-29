@@ -1,7 +1,6 @@
 // SPDX-FileCopyrightText: Contributors to the GXF project
 //
 // SPDX-License-Identifier: Apache-2.0
-
 package org.gxf.standalonenotifyinggateway.coaphttpproxy
 
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -11,7 +10,6 @@ import org.gxf.standalonenotifyinggateway.coaphttpproxy.domain.Message
 import org.junit.jupiter.api.Test
 
 class MessageValidatorTest {
-
     @Test
     fun testMessageValidatorCorrectId() {
         val jsonNode = ObjectMapper().readTree("{\"ID\": 12345}")

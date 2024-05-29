@@ -1,7 +1,6 @@
 // SPDX-FileCopyrightText: Contributors to the GXF project
 //
 // SPDX-License-Identifier: Apache-2.0
-
 package org.gxf.standalonenotifyinggateway.coaphttpproxy
 
 import com.fasterxml.jackson.databind.JsonNode
@@ -18,6 +17,8 @@ import com.github.tomakehurst.wiremock.client.WireMock.serverError
 import com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo
 import com.github.tomakehurst.wiremock.client.WireMock.urlPathTemplate
 import com.github.tomakehurst.wiremock.http.Fault
+import java.net.URI
+import java.time.Duration
 import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.Awaitility
 import org.eclipse.californium.core.coap.CoAP
@@ -33,44 +34,39 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
-import java.net.URI
-import java.time.Duration
 
 @Import(IntegrationTestCoapClient::class)
 @EnableConfigurationProperties(PskStubProperties::class, HttpProperties::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class IntegrationTest {
+    @Autowired private lateinit var coapClient: IntegrationTestCoapClient
 
-    @Autowired
-    private lateinit var coapClient: IntegrationTestCoapClient
+    @Autowired private lateinit var pskStubProperties: PskStubProperties
 
-    @Autowired
-    private lateinit var pskStubProperties: PskStubProperties
-
-    @Autowired
-    private lateinit var httpProperties: HttpProperties
+    @Autowired private lateinit var httpProperties: HttpProperties
 
     private lateinit var wiremock: WireMockServer
 
-    private val wiremockStubOk = post(urlPathTemplate("${HttpClient.MESSAGE_PATH}/{id}")).willReturn(ok("0"))
+    private val wiremockStubOk =
+        post(urlPathTemplate("${HttpClient.MESSAGE_PATH}/{id}")).willReturn(ok("0"))
     private val wiremockStubError =
-        post(urlPathTemplate("${HttpClient.MESSAGE_PATH}/{id}")).willReturn(
-            aResponse().withFault(
-                Fault.EMPTY_RESPONSE
-            )
-        )
+        post(urlPathTemplate("${HttpClient.MESSAGE_PATH}/{id}"))
+            .willReturn(aResponse().withFault(Fault.EMPTY_RESPONSE))
     private val wiremockStubInternalServerError =
-        post(urlPathTemplate("${HttpClient.MESSAGE_PATH}/{id}")).willReturn(
-            serverError()
-        )
-    private val wiremockStubErrorEndpoint = post(urlPathTemplate(HttpClient.ERROR_PATH)).willReturn(aResponse().withStatus(200))
+        post(urlPathTemplate("${HttpClient.MESSAGE_PATH}/{id}")).willReturn(serverError())
+    private val wiremockStubErrorEndpoint =
+        post(urlPathTemplate(HttpClient.ERROR_PATH)).willReturn(aResponse().withStatus(200))
     private lateinit var jsonNode: JsonNode
 
     @BeforeEach
     fun beforeEach() {
-        val wiremockStubPsk = get(urlPathTemplate(HttpClient.PSK_PATH)).willReturn(ok(pskStubProperties.defaultKey))
+        val wiremockStubPsk =
+            get(urlPathTemplate(HttpClient.PSK_PATH)).willReturn(ok(pskStubProperties.defaultKey))
 
-        jsonNode = ObjectMapper().readTree(""" 
+        jsonNode =
+            ObjectMapper()
+                .readTree(
+                    """ 
             {
                 "ID": "${pskStubProperties.defaultId}",
                 "URC": [
@@ -80,7 +76,8 @@ class IntegrationTest {
                     }
                 ]
             }
-            """)
+            """,
+                )
 
         val url = URI(httpProperties.url).toURL()
         wiremock = WireMockServer(url.port)
@@ -100,17 +97,20 @@ class IntegrationTest {
         val coapClient = coapClient.getClient()
 
         val request =
-                Request.newPost()
-                        .apply {
-                            options.setContentFormat(MediaTypeRegistry.APPLICATION_CBOR)
-                        }.setPayload(CBORMapper().writeValueAsBytes(jsonNode))
+            Request.newPost()
+                .apply { options.setContentFormat(MediaTypeRegistry.APPLICATION_CBOR) }
+                .setPayload(CBORMapper().writeValueAsBytes(jsonNode))
 
         coapClient.advanced(request)
 
         Awaitility.await().atMost(Duration.ofSeconds(5)).untilAsserted {
-            val wiremockRequests = wiremock.findAll(postRequestedFor(urlPathTemplate("${HttpClient.MESSAGE_PATH}/{id}")))
+            val wiremockRequests =
+                wiremock.findAll(
+                    postRequestedFor(urlPathTemplate("${HttpClient.MESSAGE_PATH}/{id}")),
+                )
             assertThat(wiremockRequests).hasSize(1)
-            assertThat(ObjectMapper().readTree(wiremockRequests.first().bodyAsString)).isEqualTo(jsonNode)
+            assertThat(ObjectMapper().readTree(wiremockRequests.first().bodyAsString))
+                .isEqualTo(jsonNode)
         }
     }
 
@@ -120,20 +120,22 @@ class IntegrationTest {
     fun shouldNotForwardCoapMessageToHttpWhenTheIdsDontMatch() {
         val coapClient = coapClient.getClient()
 
-        val jsonNodeWithInvalidId = (jsonNode as ObjectNode)
-                .put("ID", jsonNode.findValue("ID").asText().plus("1"))
+        val jsonNodeWithInvalidId =
+            (jsonNode as ObjectNode).put("ID", jsonNode.findValue("ID").asText().plus("1"))
 
         val request =
-                Request.newPost()
-                        .apply {
-                            options.setContentFormat(MediaTypeRegistry.APPLICATION_CBOR)
-                        }.setPayload(CBORMapper().writeValueAsBytes(jsonNodeWithInvalidId))
+            Request.newPost()
+                .apply { options.setContentFormat(MediaTypeRegistry.APPLICATION_CBOR) }
+                .setPayload(CBORMapper().writeValueAsBytes(jsonNodeWithInvalidId))
 
         val response = coapClient.advanced(request)
 
         Awaitility.await().atMost(Duration.ofSeconds(5)).untilAsserted {
-            val wiremockRequestsSng = wiremock.findAll(postRequestedFor(urlPathTemplate("${HttpClient.MESSAGE_PATH}/{id}")))
-            val wiremockRequestsError = wiremock.findAll(postRequestedFor(urlPathTemplate(HttpClient.ERROR_PATH)))
+            val wiremockRequestsSng =
+                wiremock.findAll(
+                    postRequestedFor(urlPathTemplate("${HttpClient.MESSAGE_PATH}/{id}")))
+            val wiremockRequestsError =
+                wiremock.findAll(postRequestedFor(urlPathTemplate(HttpClient.ERROR_PATH)))
 
             assertThat(wiremockRequestsSng).hasSize(0)
             assertThat(wiremockRequestsError).hasSize(1)
@@ -148,14 +150,15 @@ class IntegrationTest {
 
         val request =
             Request.newPost()
-                .apply {
-                    options.setContentFormat(MediaTypeRegistry.APPLICATION_CBOR)
-                }.setPayload(CBORMapper().writeValueAsBytes(jsonNode))
+                .apply { options.setContentFormat(MediaTypeRegistry.APPLICATION_CBOR) }
+                .setPayload(CBORMapper().writeValueAsBytes(jsonNode))
 
         val response = coapClient.advanced(request)
 
         Awaitility.await().atMost(Duration.ofSeconds(5)).untilAsserted {
-            val wiremockRequests = wiremock.findAll(postRequestedFor(urlPathTemplate("${HttpClient.MESSAGE_PATH}/{id}")))
+            val wiremockRequests =
+                wiremock.findAll(
+                    postRequestedFor(urlPathTemplate("${HttpClient.MESSAGE_PATH}/{id}")))
             val wiremockRequestsErrorEndpoint =
                 wiremock.findAll(postRequestedFor(urlPathEqualTo(HttpClient.ERROR_PATH)))
 
@@ -172,7 +175,8 @@ class IntegrationTest {
 
         Awaitility.await().atMost(Duration.ofSeconds(5)).untilAsserted {
             val wiremockRequests =
-                wiremock.findAll(postRequestedFor(urlPathTemplate("${HttpClient.MESSAGE_PATH}/{id}")))
+                wiremock.findAll(
+                    postRequestedFor(urlPathTemplate("${HttpClient.MESSAGE_PATH}/{id}")))
             val request = createRequest(jsonNode)
             val response = coapClient.advanced(request)
             assertThat(wiremockRequests).hasSize(1)
@@ -184,8 +188,7 @@ class IntegrationTest {
         val payload = CBORMapper().writeValueAsBytes(jsonNode)
 
         return Request.newPost()
-            .apply {
-                options.setContentFormat(MediaTypeRegistry.APPLICATION_CBOR)
-            }.setPayload(payload)
+            .apply { options.setContentFormat(MediaTypeRegistry.APPLICATION_CBOR) }
+            .setPayload(payload)
     }
 }

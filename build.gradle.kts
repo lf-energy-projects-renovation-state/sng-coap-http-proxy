@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+import com.diffplug.gradle.spotless.SpotlessExtension
 import io.spring.gradle.dependencymanagement.internal.dsl.StandardDependencyManagementExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -12,11 +13,13 @@ plugins {
     kotlin("plugin.spring") version "1.9.23" apply false
     kotlin("plugin.jpa") version "1.9.23" apply false
     id("com.github.davidmc24.gradle.plugin.avro") version "1.9.1" apply false
+    id("com.diffplug.spotless") version "6.25.0"
     id("org.sonarqube") version "4.4.1.3373"
     id("eclipse")
 }
 
 version = System.getenv("GITHUB_REF_NAME")?.replace("/", "-")?.lowercase() ?: "develop"
+
 sonar {
     properties {
         property("sonar.host.url", "https://sonarcloud.io")
@@ -26,16 +29,11 @@ sonar {
     }
 }
 
-extra["archUnitVersion"] = "1.1.0"
-extra["californiumVersion"] = "3.8.0"
-extra["kotlinLoggingJvmVersion"] = "3.0.5"
-extra["mockitoKotlinVersion"] = "5.1.0"
-extra["mockServerVersion"] = "5.15.0"
-
 subprojects {
     apply(plugin = "org.jetbrains.kotlin.jvm")
     apply(plugin = "org.jetbrains.kotlin.plugin.spring")
     apply(plugin = "io.spring.dependency-management")
+    apply(plugin = "com.diffplug.spotless")
     apply(plugin = "eclipse")
     apply(plugin = "org.jetbrains.kotlin.plugin.jpa")
     apply(plugin = "jacoco")
@@ -44,20 +42,25 @@ subprojects {
     group = "org.gxf.standalonenotifyinggateway"
     version = rootProject.version
 
-    repositories {
-        mavenCentral()
+    repositories { mavenCentral() }
+
+    extensions.configure<SpotlessExtension> {
+        kotlin {
+            // by default the target is every '.kt' and '.kts' file in the java source sets
+            ktfmt().dropboxStyle()
+            licenseHeaderFile(
+                "${project.rootDir}/license-template.kt",
+                "package")
+                .updateYearWithLatest(false)
+        }
     }
 
     extensions.configure<JavaPluginExtension> {
-        toolchain {
-            languageVersion.set(JavaLanguageVersion.of(21))
-        }
+        toolchain { languageVersion.set(JavaLanguageVersion.of(21)) }
     }
 
     extensions.configure<StandardDependencyManagementExtension> {
-        imports {
-            mavenBom(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
-        }
+        imports { mavenBom(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES) }
     }
 
     tasks.withType<KotlinCompile> {
@@ -67,7 +70,5 @@ subprojects {
         }
     }
 
-    tasks.withType<Test> {
-        useJUnitPlatform()
-    }
+    tasks.withType<Test> { useJUnitPlatform() }
 }
