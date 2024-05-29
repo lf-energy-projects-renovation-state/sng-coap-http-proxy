@@ -71,12 +71,17 @@ class CoapConfiguration(
     }
 
     fun updateDtlsConfig(config: CaliforniumConfiguration) {
-        config.set(DtlsConfig.DTLS_ROLE, DtlsRole.SERVER_ONLY)
-                .set(DtlsConfig.DTLS_RECOMMENDED_CIPHER_SUITES_ONLY, false)
-                // TODO revert after pentest is complete: FDP-2197
-                .set(DtlsConfig.DTLS_PRESELECTED_CIPHER_SUITES, listOf(TLS_PSK_WITH_AES_128_CBC_SHA256, CipherSuite.TLS_PSK_WITH_AES_128_CCM_8))
-                .set(DtlsConfig.DTLS_CIPHER_SUITES, listOf(TLS_PSK_WITH_AES_128_CBC_SHA256, CipherSuite.TLS_PSK_WITH_AES_128_CCM_8))
-                .set(DtlsConfig.DTLS_CLIENT_AUTHENTICATION_MODE, CertificateAuthenticationMode.NONE)
+        config
+            .set(DtlsConfig.DTLS_ROLE, DtlsRole.SERVER_ONLY)
+            .set(DtlsConfig.DTLS_RECOMMENDED_CIPHER_SUITES_ONLY, false)
+            // TODO revert after pentest is complete: FDP-2197
+            .set(
+                DtlsConfig.DTLS_PRESELECTED_CIPHER_SUITES,
+                listOf(TLS_PSK_WITH_AES_128_CBC_SHA256, CipherSuite.TLS_PSK_WITH_AES_128_CCM_8))
+            .set(
+                DtlsConfig.DTLS_CIPHER_SUITES,
+                listOf(TLS_PSK_WITH_AES_128_CBC_SHA256, CipherSuite.TLS_PSK_WITH_AES_128_CCM_8))
+            .set(DtlsConfig.DTLS_CLIENT_AUTHENTICATION_MODE, CertificateAuthenticationMode.NONE)
     }
 
     @Bean
