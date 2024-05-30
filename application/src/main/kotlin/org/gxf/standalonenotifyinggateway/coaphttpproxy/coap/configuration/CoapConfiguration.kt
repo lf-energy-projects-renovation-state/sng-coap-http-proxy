@@ -17,7 +17,6 @@ import org.eclipse.californium.scandium.MdcConnectionListener
 import org.eclipse.californium.scandium.config.DtlsConfig
 import org.eclipse.californium.scandium.config.DtlsConfig.DtlsRole
 import org.eclipse.californium.scandium.config.DtlsConnectorConfig
-import org.eclipse.californium.scandium.dtls.cipher.CipherSuite
 import org.eclipse.californium.scandium.dtls.cipher.CipherSuite.TLS_PSK_WITH_AES_128_CBC_SHA256
 import org.eclipse.californium.scandium.dtls.pskstore.AdvancedPskStore
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.configuration.properties.CoapProperties
