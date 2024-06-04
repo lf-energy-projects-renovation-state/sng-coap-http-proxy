@@ -20,6 +20,9 @@ dependencies {
     implementation(libs.commonsCodec)
 
     runtimeOnly("io.micrometer:micrometer-registry-prometheus")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql")
+
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
     testImplementation("org.mockito:mockito-junit-jupiter")
     testImplementation(libs.mockitoKotlin)
