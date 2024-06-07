@@ -2,6 +2,22 @@
 #
 #SPDX-License-Identifier: Apache-2.0
 
+# Default server ssl bundle
+spring:
+  ssl:
+    bundle:
+      pem:
+        coap-http-proxy:
+          keystore:
+            private-key: "${mutual-tls.keystore.private-key}"
+            certificate: "${mutual-tls.keystore.certificate}"
+          truststore:
+            certificate: "${mutual-tls.truststore.certificate}"
+
+config:
+  http:
+    ssl-bundle: "coap-http-proxy"
+
 management:
   endpoints:
     web:

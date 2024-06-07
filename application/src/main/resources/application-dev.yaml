@@ -5,11 +5,13 @@
 server:
   port: 8181
 
-management:
-  endpoints:
-    web:
-      exposure:
-        include: prometheus
+# Local testing certificates
+mutual-tls:
+  keystore:
+    private-key: "classpath:ssl/dev-proxy-key.pem"
+    certificate: "classpath:ssl/dev-proxy-cert.pem"
+  truststore:
+    certificate: "classpath:ssl/dev-device-service-cert.pem"
 
 config:
   coap:
@@ -24,8 +26,8 @@ config:
     preferred-block-size: 1024
 
   http:
-    url: "http://localhost:9000"
-    connection-timeout: 5000ms
+    url: "https://localhost:9000"
+    connection-timeout: "5000ms"
 
   udp:
     udp-receive-buffer-size: 8192
