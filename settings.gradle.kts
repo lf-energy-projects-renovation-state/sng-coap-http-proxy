@@ -17,7 +17,7 @@ dependencyResolutionManagement {
 
             library("mockServer", "org.mock-server", "mockserver-spring-test-listener").version("5.15.0")
 
-            library("commonsCodec", "commons-codec", "commons-codec").version("1.16.0")
+            library("commonsCodec", "commons-codec", "commons-codec").version("1.17.0")
 
             library("mockitoKotlin", "org.mockito.kotlin", "mockito-kotlin").version("5.1.0")
 
