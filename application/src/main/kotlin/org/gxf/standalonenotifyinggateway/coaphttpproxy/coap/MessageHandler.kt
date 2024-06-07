@@ -28,7 +28,7 @@ class MessageHandler(
     fun handlePost(
         id: String,
         payload: ByteArray,
-    ): ResponseEntity<String>? {
+    ): ResponseEntity<String> {
         val parsedJson = cborMapper.readTree(payload)
         val message = Message(id, parsedJson)
 

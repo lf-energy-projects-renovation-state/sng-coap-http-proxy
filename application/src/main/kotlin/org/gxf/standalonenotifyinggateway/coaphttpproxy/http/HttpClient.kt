@@ -24,7 +24,7 @@ class HttpClient(private val webClient: RestClient) {
     private val logger = KotlinLogging.logger {}
 
     @Throws(HttpClientErrorException::class, HttpServerErrorException::class)
-    fun postMessage(message: Message): ResponseEntity<String>? {
+    fun postMessage(message: Message): ResponseEntity<String> {
         val (id, payload) = message
 
         val urc = getUrcFromMessage(payload)
