@@ -59,7 +59,6 @@ testing {
                     implementation(project())
                     implementation(libs.wiremock)
                     implementation("org.springframework.boot:spring-boot-starter-test")
-                    implementation(libs.mockServer)
                     implementation(libs.californiumCore)
                     implementation(libs.californiumScandium)
                     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-cbor")
