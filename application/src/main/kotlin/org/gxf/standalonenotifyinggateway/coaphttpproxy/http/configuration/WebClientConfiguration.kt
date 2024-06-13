@@ -14,6 +14,7 @@ import org.springframework.web.client.RestClient
 
 @Configuration
 class WebClientConfiguration(private val httpProps: HttpProperties) {
+
     @Bean
     fun webClient(
         webClientBuilder: RestClient.Builder,
@@ -32,9 +33,5 @@ class WebClientConfiguration(private val httpProps: HttpProperties) {
             .build()
 
     private fun requestFactory() =
-        JdkClientHttpRequestFactory().apply {
-            this.setReadTimeout(
-                httpProps.connectionTimeout,
-            )
-        }
+        JdkClientHttpRequestFactory().apply { setReadTimeout(httpProps.connectionTimeout) }
 }

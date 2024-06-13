@@ -20,6 +20,9 @@ dependencies {
     implementation(libs.commonsCodec)
 
     runtimeOnly("io.micrometer:micrometer-registry-prometheus")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql")
+
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
     testImplementation("org.mockito:mockito-junit-jupiter")
     testImplementation(libs.mockitoKotlin)
@@ -56,7 +59,6 @@ testing {
                     implementation(project())
                     implementation(libs.wiremock)
                     implementation("org.springframework.boot:spring-boot-starter-test")
-                    implementation(libs.mockServer)
                     implementation(libs.californiumCore)
                     implementation(libs.californiumScandium)
                     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-cbor")

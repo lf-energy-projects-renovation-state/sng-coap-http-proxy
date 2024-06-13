@@ -18,11 +18,11 @@ config:
     coaps-port: 55684
     path: "sng"
 
-    deduplicator: NO_DEDUPLICATOR
+    de-duplicator: "NO_DEDUPLICATOR"
     max-active-peers: 20000
     max-message-size: 1024
-    max-peer-inactivity-period: 24h
-    maxr-esource-body-size: 8192
+    max-peer-inactivity-period: "24h"
+    max-resource-body-size: 8192
     preferred-block-size: 1024
 
   http:
@@ -32,4 +32,4 @@ config:
   udp:
     udp-receive-buffer-size: 8192
     udp-send-buffer-size: 8192
-    health-status-interval-in-seconds: 60
+    health-status-interval: "60s"

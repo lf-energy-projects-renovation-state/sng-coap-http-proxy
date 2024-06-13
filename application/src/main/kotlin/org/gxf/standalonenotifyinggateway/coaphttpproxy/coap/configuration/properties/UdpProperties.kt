@@ -10,5 +10,5 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 class UdpProperties(
     val udpReceiveBufferSize: Int,
     val udpSendBufferSize: Int,
-    val healthStatusIntervalInSeconds: Duration,
+    val healthStatusInterval: Duration,
 )

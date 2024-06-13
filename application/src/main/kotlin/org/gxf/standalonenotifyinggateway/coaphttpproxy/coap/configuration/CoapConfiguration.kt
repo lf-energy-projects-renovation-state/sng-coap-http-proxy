@@ -65,7 +65,7 @@ class CoapConfiguration(
             .set(UdpConfig.UDP_SEND_BUFFER_SIZE, udpProps.udpSendBufferSize)
             .set(
                 SystemConfig.HEALTH_STATUS_INTERVAL,
-                udpProps.healthStatusIntervalInSeconds.seconds,
+                udpProps.healthStatusInterval.seconds,
                 TimeUnit.SECONDS)
     }
 
