@@ -9,21 +9,22 @@ include("application")
 dependencyResolutionManagement {
     versionCatalogs {
         create("libs") {
-            version("californiumVersion", "3.8.0")
-            library("californiumCore", "org.eclipse.californium", "californium-core").versionRef("californiumVersion")
-            library("californiumScandium", "org.eclipse.californium", "scandium").versionRef("californiumVersion")
+            version("kotlinLogging", "7.0.0")
+            version("mockitoKotlin", "5.3.1")
+            version("commonsCodec", "1.17.0")
+            version("californium", "3.8.0")
+            version("wiremock", "3.6.0")
 
-            library("kotlinLoggingJvm", "io.github.oshai", "kotlin-logging-jvm").version("6.0.9")
+            library("californiumCore", "org.eclipse.californium", "californium-core").versionRef("californium")
+            library("californiumScandium", "org.eclipse.californium", "scandium").versionRef("californium")
 
-            library("commonsCodec", "commons-codec", "commons-codec").version("1.17.0")
+            library("kotlinLoggingJvm", "io.github.oshai", "kotlin-logging-jvm").versionRef("kotlinLogging")
 
-            library("mockitoKotlin", "org.mockito.kotlin", "mockito-kotlin").version("5.3.1")
+            library("commonsCodec", "commons-codec", "commons-codec").versionRef("commonsCodec")
 
-            library("wiremock", "org.wiremock", "wiremock-standalone").version("3.6.0")
-        }
-        create("integrationTestLibs") {
-            library("h2", "com.h2database", "h2").withoutVersion()
-            library("kafkaTestContainers", "org.testcontainers", "kafka").withoutVersion()
+            library("mockitoKotlin", "org.mockito.kotlin", "mockito-kotlin").versionRef("mockitoKotlin")
+
+            library("wiremock", "org.wiremock", "wiremock-standalone").versionRef("wiremock")
         }
     }
 }
