@@ -20,8 +20,6 @@ config:
 
 # Run the actuator under a different not tls port
 management:
-  server:
-    port: 8081
   endpoints:
     web:
       exposure:
