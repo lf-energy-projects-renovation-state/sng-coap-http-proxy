@@ -18,7 +18,6 @@ config:
   http:
     ssl-bundle: "coap-http-proxy"
 
-# Run the actuator under a different not tls port
 management:
   endpoints:
     web:
