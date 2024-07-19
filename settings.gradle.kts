@@ -10,7 +10,7 @@ dependencyResolutionManagement {
     versionCatalogs {
         create("libs") {
             version("kotlinLogging", "7.0.0")
-            version("mockitoKotlin", "5.3.1")
+            version("mockitoKotlin", "5.4.0")
             version("commonsCodec", "1.17.0")
             version("californium", "3.8.0")
             version("wiremock", "3.6.0")
