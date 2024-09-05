@@ -17,7 +17,6 @@ config:
   coap:
     coaps-port: 55684
     path: "sng"
-
     de-duplicator: "NO_DEDUPLICATOR"
     max-active-peers: 20000
     max-message-size: 1024

@@ -4,6 +4,7 @@
 package org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.configuration.properties
 
 import java.time.Duration
+import org.eclipse.californium.scandium.dtls.cipher.CipherSuite
 import org.springframework.boot.context.properties.ConfigurationProperties
 
 @ConfigurationProperties(prefix = "config.coap")
@@ -16,4 +17,5 @@ class CoapProperties(
     val maxPeerInactivityPeriod: Duration,
     val maxResourceBodySize: Int,
     val preferredBlockSize: Int,
+    val cipherSuites: List<CipherSuite>
 )
