@@ -17,6 +17,8 @@ spring:
 config:
   http:
     ssl-bundle: "coap-http-proxy"
+  coap:
+    cipher-suites: TLS_PSK_WITH_AES_128_CBC_SHA256, TLS_PSK_WITH_AES_128_GCM_SHA256
 
 management:
   endpoints:
