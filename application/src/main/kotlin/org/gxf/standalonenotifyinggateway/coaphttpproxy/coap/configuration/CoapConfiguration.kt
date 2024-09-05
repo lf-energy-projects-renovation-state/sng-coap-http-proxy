@@ -17,7 +17,6 @@ import org.eclipse.californium.scandium.MdcConnectionListener
 import org.eclipse.californium.scandium.config.DtlsConfig
 import org.eclipse.californium.scandium.config.DtlsConfig.DtlsRole
 import org.eclipse.californium.scandium.config.DtlsConnectorConfig
-import org.eclipse.californium.scandium.dtls.cipher.CipherSuite
 import org.eclipse.californium.scandium.dtls.cipher.CipherSuite.TLS_PSK_WITH_AES_128_CBC_SHA256
 import org.eclipse.californium.scandium.dtls.cipher.CipherSuite.TLS_PSK_WITH_AES_128_GCM_SHA256
 import org.eclipse.californium.scandium.dtls.pskstore.AdvancedPskStore
@@ -78,9 +77,7 @@ class CoapConfiguration(
             .set(
                 DtlsConfig.DTLS_PRESELECTED_CIPHER_SUITES,
                 listOf(TLS_PSK_WITH_AES_128_CBC_SHA256, TLS_PSK_WITH_AES_128_GCM_SHA256))
-            .set(
-                DtlsConfig.DTLS_CIPHER_SUITES,
-                coapProps.cipherSuites)
+            .set(DtlsConfig.DTLS_CIPHER_SUITES, coapProps.cipherSuites)
             .set(DtlsConfig.DTLS_CLIENT_AUTHENTICATION_MODE, CertificateAuthenticationMode.NONE)
     }
 

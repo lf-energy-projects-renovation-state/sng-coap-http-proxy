@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.configuration.properties
 
-import org.eclipse.californium.scandium.dtls.cipher.CipherSuite
 import java.time.Duration
+import org.eclipse.californium.scandium.dtls.cipher.CipherSuite
 import org.springframework.boot.context.properties.ConfigurationProperties
 
 @ConfigurationProperties(prefix = "config.coap")
