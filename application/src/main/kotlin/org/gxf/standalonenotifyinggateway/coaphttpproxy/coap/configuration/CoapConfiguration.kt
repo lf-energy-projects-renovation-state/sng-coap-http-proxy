@@ -75,8 +75,12 @@ class CoapConfiguration(
         config
             .set(DtlsConfig.DTLS_ROLE, DtlsRole.SERVER_ONLY)
             .set(DtlsConfig.DTLS_RECOMMENDED_CIPHER_SUITES_ONLY, false)
-            .set(DtlsConfig.DTLS_PRESELECTED_CIPHER_SUITES, listOf(TLS_PSK_WITH_AES_128_CBC_SHA256, TLS_PSK_WITH_AES_128_GCM_SHA256))
-            .set(DtlsConfig.DTLS_CIPHER_SUITES, coapProps.cipherSuites.map { name -> CipherSuite.getTypeByName(name) })
+            .set(
+                DtlsConfig.DTLS_PRESELECTED_CIPHER_SUITES,
+                listOf(TLS_PSK_WITH_AES_128_CBC_SHA256, TLS_PSK_WITH_AES_128_GCM_SHA256))
+            .set(
+                DtlsConfig.DTLS_CIPHER_SUITES,
+                coapProps.cipherSuites.map { name -> CipherSuite.getTypeByName(name) })
             .set(DtlsConfig.DTLS_CLIENT_AUTHENTICATION_MODE, CertificateAuthenticationMode.NONE)
     }
 

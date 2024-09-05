@@ -56,7 +56,9 @@ class IntegrationTestCoapClient {
         return Configuration.getStandard()
             .set(CoapConfig.COAP_SECURE_PORT, coapsPort.toInt())
             .set(DtlsConfig.DTLS_ROLE, DtlsConfig.DtlsRole.CLIENT_ONLY)
-            .set(DtlsConfig.DTLS_CIPHER_SUITES, cipherSuites.map { name -> CipherSuite.getTypeByName(name) })
+            .set(
+                DtlsConfig.DTLS_CIPHER_SUITES,
+                cipherSuites.map { name -> CipherSuite.getTypeByName(name) })
     }
 
     private fun getUri(): String =
