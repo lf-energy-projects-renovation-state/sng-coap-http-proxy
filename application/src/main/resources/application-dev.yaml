@@ -17,13 +17,13 @@ config:
   coap:
     coaps-port: 55684
     path: "sng"
-
     de-duplicator: "NO_DEDUPLICATOR"
     max-active-peers: 20000
     max-message-size: 1024
     max-peer-inactivity-period: "24h"
     max-resource-body-size: 8192
     preferred-block-size: 1024
+    cipher-suites: TLS_PSK_WITH_AES_128_CBC_SHA256, TLS_PSK_WITH_AES_128_GCM_SHA256
 
   http:
     url: "https://localhost:9000"
