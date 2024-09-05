@@ -30,7 +30,7 @@ class IntegrationTestCoapClient {
 
     @Value("\${config.psk.default-key}") private lateinit var defaultKey: String
 
-    @Value("\${config.coap.cipher-suites}") private lateinit var cipherSuites: List<String>
+    @Value("\${config.coap.cipher-suites}") private lateinit var cipherSuites: List<CipherSuite>
 
     init {
         DtlsConfig.register()
@@ -58,7 +58,7 @@ class IntegrationTestCoapClient {
             .set(DtlsConfig.DTLS_ROLE, DtlsConfig.DtlsRole.CLIENT_ONLY)
             .set(
                 DtlsConfig.DTLS_CIPHER_SUITES,
-                cipherSuites.map { name -> CipherSuite.getTypeByName(name) })
+                cipherSuites)
     }
 
     private fun getUri(): String =

@@ -80,7 +80,7 @@ class CoapConfiguration(
                 listOf(TLS_PSK_WITH_AES_128_CBC_SHA256, TLS_PSK_WITH_AES_128_GCM_SHA256))
             .set(
                 DtlsConfig.DTLS_CIPHER_SUITES,
-                coapProps.cipherSuites.map { name -> CipherSuite.getTypeByName(name) })
+                coapProps.cipherSuites)
             .set(DtlsConfig.DTLS_CLIENT_AUTHENTICATION_MODE, CertificateAuthenticationMode.NONE)
     }
 
