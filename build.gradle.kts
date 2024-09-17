@@ -5,6 +5,7 @@
 import com.diffplug.gradle.spotless.SpotlessExtension
 import io.spring.gradle.dependencymanagement.internal.dsl.StandardDependencyManagementExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("org.springframework.boot") version "3.3.3" apply false
@@ -67,4 +68,17 @@ subprojects {
     }
 
     tasks.withType<Test> { useJUnitPlatform() }
+
+    tasks.register<Copy>("updateGitHooks") {
+        description = "Copies the pre-commit Git Hook to the .git/hooks folder."
+        group = "verification"
+        from("${project.rootDir}/scripts/pre-commit")
+        into("${project.rootDir}/.git/hooks")
+    }
+
+    tasks.withType<KotlinCompile> {
+        dependsOn(
+            tasks.named("updateGitHooks")
+        )
+    }
 }
