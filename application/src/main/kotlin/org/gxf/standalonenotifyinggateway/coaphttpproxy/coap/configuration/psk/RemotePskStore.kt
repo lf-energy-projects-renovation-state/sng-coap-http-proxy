@@ -19,8 +19,7 @@ import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
 
 @Component
-class RemotePskStore(private val webClient: RestClient, private val remoteLogger: RemoteLogger) :
-    AdvancedPskStore {
+class RemotePskStore(private val webClient: RestClient, private val remoteLogger: RemoteLogger) : AdvancedPskStore {
     override fun hasEcdhePskSupported(): Boolean {
         return true
     }

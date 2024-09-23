@@ -56,7 +56,6 @@ class MessageHandlerTest {
 
         messageHandler.handlePost("12345", testCbor)
 
-        verify(httpClient)
-            .postMessage(check { assertThat(it).usingRecursiveComparison().isEqualTo(message) })
+        verify(httpClient).postMessage(check { assertThat(it).usingRecursiveComparison().isEqualTo(message) })
     }
 }

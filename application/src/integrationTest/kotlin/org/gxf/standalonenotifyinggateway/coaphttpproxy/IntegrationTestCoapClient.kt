@@ -44,10 +44,7 @@ class IntegrationTestCoapClient {
         val coapClient = CoapClient(uri)
         val dtlsConnector = this.createDtlsConnector()
         val endpoint =
-            CoapEndpoint.Builder()
-                .setConfiguration(createConfiguration())
-                .setConnector(dtlsConnector)
-                .build()
+            CoapEndpoint.Builder().setConfiguration(createConfiguration()).setConnector(dtlsConnector).build()
         coapClient.setEndpoint(endpoint)
         return coapClient
     }
@@ -59,8 +56,7 @@ class IntegrationTestCoapClient {
             .set(DtlsConfig.DTLS_CIPHER_SUITES, cipherSuites)
     }
 
-    private fun getUri(): String =
-        String.format("%s://%s:%d/%s", "coaps", "localhost", coapsPort.toInt(), path)
+    private fun getUri(): String = String.format("%s://%s:%d/%s", "coaps", "localhost", coapsPort.toInt(), path)
 
     private fun createDtlsConnector(): DTLSConnector {
         val address = InetSocketAddress(0)

@@ -47,11 +47,9 @@ class IntegrationTest {
 
     private lateinit var wiremock: WireMockServer
 
-    private val wiremockStubOk =
-        post(urlPathTemplate("${HttpClient.MESSAGE_PATH}/{id}")).willReturn(ok("0"))
+    private val wiremockStubOk = post(urlPathTemplate("${HttpClient.MESSAGE_PATH}/{id}")).willReturn(ok("0"))
     private val wiremockStubError =
-        post(urlPathTemplate("${HttpClient.MESSAGE_PATH}/{id}"))
-            .willReturn(aResponse().withFault(Fault.EMPTY_RESPONSE))
+        post(urlPathTemplate("${HttpClient.MESSAGE_PATH}/{id}")).willReturn(aResponse().withFault(Fault.EMPTY_RESPONSE))
     private val wiremockStubInternalServerError =
         post(urlPathTemplate("${HttpClient.MESSAGE_PATH}/{id}")).willReturn(serverError())
     private val wiremockStubErrorEndpoint =
@@ -60,8 +58,7 @@ class IntegrationTest {
 
     @BeforeEach
     fun beforeEach() {
-        val wiremockStubPsk =
-            get(urlPathTemplate(HttpClient.PSK_PATH)).willReturn(ok(pskStubProperties.defaultKey))
+        val wiremockStubPsk = get(urlPathTemplate(HttpClient.PSK_PATH)).willReturn(ok(pskStubProperties.defaultKey))
 
         jsonNode =
             ObjectMapper()
@@ -109,8 +106,7 @@ class IntegrationTest {
                     postRequestedFor(urlPathTemplate("${HttpClient.MESSAGE_PATH}/{id}")),
                 )
             assertThat(wiremockRequests).hasSize(1)
-            assertThat(ObjectMapper().readTree(wiremockRequests.first().bodyAsString))
-                .isEqualTo(jsonNode)
+            assertThat(ObjectMapper().readTree(wiremockRequests.first().bodyAsString)).isEqualTo(jsonNode)
         }
     }
 
@@ -120,8 +116,7 @@ class IntegrationTest {
     fun shouldNotForwardCoapMessageToHttpWhenTheIdsDontMatch() {
         val coapClient = coapClient.getClient()
 
-        val jsonNodeWithInvalidId =
-            (jsonNode as ObjectNode).put("ID", jsonNode.findValue("ID").asText().plus("1"))
+        val jsonNodeWithInvalidId = (jsonNode as ObjectNode).put("ID", jsonNode.findValue("ID").asText().plus("1"))
 
         val request =
             Request.newPost()
@@ -132,10 +127,8 @@ class IntegrationTest {
 
         Awaitility.await().atMost(Duration.ofSeconds(5)).untilAsserted {
             val wiremockRequestsSng =
-                wiremock.findAll(
-                    postRequestedFor(urlPathTemplate("${HttpClient.MESSAGE_PATH}/{id}")))
-            val wiremockRequestsError =
-                wiremock.findAll(postRequestedFor(urlPathTemplate(HttpClient.ERROR_PATH)))
+                wiremock.findAll(postRequestedFor(urlPathTemplate("${HttpClient.MESSAGE_PATH}/{id}")))
+            val wiremockRequestsError = wiremock.findAll(postRequestedFor(urlPathTemplate(HttpClient.ERROR_PATH)))
 
             assertThat(wiremockRequestsSng).hasSize(0)
             assertThat(wiremockRequestsError).hasSize(1)
@@ -157,8 +150,7 @@ class IntegrationTest {
 
         Awaitility.await().atMost(Duration.ofSeconds(5)).untilAsserted {
             val wiremockRequests =
-                wiremock.findAll(
-                    postRequestedFor(urlPathTemplate("${HttpClient.MESSAGE_PATH}/{id}")))
+                wiremock.findAll(postRequestedFor(urlPathTemplate("${HttpClient.MESSAGE_PATH}/{id}")))
             val wiremockRequestsErrorEndpoint =
                 wiremock.findAll(postRequestedFor(urlPathEqualTo(HttpClient.ERROR_PATH)))
 
@@ -175,8 +167,7 @@ class IntegrationTest {
 
         Awaitility.await().atMost(Duration.ofSeconds(5)).untilAsserted {
             val wiremockRequests =
-                wiremock.findAll(
-                    postRequestedFor(urlPathTemplate("${HttpClient.MESSAGE_PATH}/{id}")))
+                wiremock.findAll(postRequestedFor(urlPathTemplate("${HttpClient.MESSAGE_PATH}/{id}")))
             val request = createRequest(jsonNode)
             val response = coapClient.advanced(request)
             assertThat(wiremockRequests).hasSize(1)
