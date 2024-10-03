@@ -26,10 +26,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration as SpringConfiguration
 
 @SpringConfiguration
-class CoapConfiguration(
-    private val coapProps: CoapProperties,
-    private val udpProps: UdpProperties
-) {
+class CoapConfiguration(private val coapProps: CoapProperties, private val udpProps: UdpProperties) {
 
     init {
         DtlsConfig.register()
@@ -54,20 +51,14 @@ class CoapConfiguration(
             .set(CoapConfig.PREFERRED_BLOCK_SIZE, coapProps.preferredBlockSize)
             .set(CoapConfig.DEDUPLICATOR, coapProps.deduplicator)
             .set(CoapConfig.COAP_SECURE_PORT, coapProps.coapsPort)
-            .set(
-                CoapConfig.MAX_PEER_INACTIVITY_PERIOD,
-                coapProps.maxPeerInactivityPeriod.seconds,
-                TimeUnit.SECONDS)
+            .set(CoapConfig.MAX_PEER_INACTIVITY_PERIOD, coapProps.maxPeerInactivityPeriod.seconds, TimeUnit.SECONDS)
     }
 
     fun updateUdpConfigFromProperties(config: CaliforniumConfiguration) {
         config
             .set(UdpConfig.UDP_RECEIVE_BUFFER_SIZE, udpProps.udpReceiveBufferSize)
             .set(UdpConfig.UDP_SEND_BUFFER_SIZE, udpProps.udpSendBufferSize)
-            .set(
-                SystemConfig.HEALTH_STATUS_INTERVAL,
-                udpProps.healthStatusInterval.seconds,
-                TimeUnit.SECONDS)
+            .set(SystemConfig.HEALTH_STATUS_INTERVAL, udpProps.healthStatusInterval.seconds, TimeUnit.SECONDS)
     }
 
     fun updateDtlsConfig(config: CaliforniumConfiguration) {

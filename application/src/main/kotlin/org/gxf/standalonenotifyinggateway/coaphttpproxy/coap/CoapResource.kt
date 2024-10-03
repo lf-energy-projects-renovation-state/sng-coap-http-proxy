@@ -41,13 +41,10 @@ class CoapResource(
             // Intentional exception throwing when the response is null or when there is no body
             writeResponse(coapExchange, response?.body!!, deviceId)
         } catch (e: Exception) {
-            logger.warn {
-                "Error occurred while handling post to device service for device $deviceId"
-            }
+            logger.warn { "Error occurred while handling post to device service for device $deviceId" }
             when (e) {
                 is HttpClientErrorException -> handleError(coapExchange, ResponseCode.BAD_REQUEST)
-                is HttpServerErrorException ->
-                    handleError(coapExchange, ResponseCode.INTERNAL_SERVER_ERROR)
+                is HttpServerErrorException -> handleError(coapExchange, ResponseCode.INTERNAL_SERVER_ERROR)
                 is InvalidMessageException -> handleInvalidMessage(coapExchange)
                 else -> handleUnexpectedError(coapExchange, e)
             }

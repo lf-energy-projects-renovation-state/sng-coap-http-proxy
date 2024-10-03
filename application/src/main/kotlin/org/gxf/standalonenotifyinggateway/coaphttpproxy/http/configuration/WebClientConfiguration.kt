@@ -32,6 +32,5 @@ class WebClientConfiguration(private val httpProps: HttpProperties) {
             }
             .build()
 
-    private fun requestFactory() =
-        JdkClientHttpRequestFactory().apply { setReadTimeout(httpProps.connectionTimeout) }
+    private fun requestFactory() = JdkClientHttpRequestFactory().apply { setReadTimeout(httpProps.connectionTimeout) }
 }

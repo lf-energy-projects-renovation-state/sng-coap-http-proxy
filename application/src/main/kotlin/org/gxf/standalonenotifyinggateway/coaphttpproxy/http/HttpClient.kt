@@ -47,6 +47,5 @@ class HttpClient(private val webClient: RestClient) {
     private fun executeRequest(
         id: String,
         body: String,
-    ): ResponseEntity<String> =
-        webClient.post().uri("$MESSAGE_PATH/$id").body(body).retrieve().toEntity<String>()
+    ): ResponseEntity<String> = webClient.post().uri("$MESSAGE_PATH/$id").body(body).retrieve().toEntity<String>()
 }
