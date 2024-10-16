@@ -12,7 +12,7 @@ config:
     max-peer-inactivity-period: 24h
     max-resource-body-size: 8192
     preferred-block-size: 1024
-    cipher-suites: TLS_PSK_WITH_AES_128_CBC_SHA256, TLS_PSK_WITH_AES_128_GCM_SHA256
+    cipher-suites: TLS_PSK_WITH_AES_128_GCM_SHA256
 
   http:
     url: "http://localhost:9000"
