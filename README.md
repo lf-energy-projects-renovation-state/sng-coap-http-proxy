@@ -9,6 +9,6 @@ The HTTP client side is implemented using a [Spring WebClient](https://docs.spri
 
 The payload received from the devices is expected to be a JSON string in [CBOR](https://cbor.io/) format and should contain an ID field.
 
-Currently the proxy performs a simple validation on the ID contained in the payload and the Identity used by the device when setting up a connection, before forwarding the message to the HTTP server.
+The proxy performs a validation on the ID contained in the payload and the Identity used by the device when setting up a connection, before forwarding the message to the HTTP server.
 
-Although some basic support for DTLS is already present, the implementation of PSK management, is still work in progress and will become available in a later version.
+The proxy supports DTLS. PSKs are retrieved from the [crest device service](https://github.com/OSGP/sng-crest-device-service/).
