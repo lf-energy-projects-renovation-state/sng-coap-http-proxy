@@ -10,7 +10,7 @@ dependencyResolutionManagement {
     versionCatalogs {
         create("libs") {
             version("kotlinLogging", "7.0.0")
-            version("mockitoKotlin", "5.4.0")
+            version("mockk", "1.13.13")
             version("commonsCodec", "1.17.1")
             version("californium", "3.8.0")
             version("wiremock", "3.6.0")
@@ -22,7 +22,7 @@ dependencyResolutionManagement {
 
             library("commonsCodec", "commons-codec", "commons-codec").versionRef("commonsCodec")
 
-            library("mockitoKotlin", "org.mockito.kotlin", "mockito-kotlin").versionRef("mockitoKotlin")
+            library("mockk", "io.mockk", "mockk").versionRef("mockk")
 
             library("wiremock", "org.wiremock", "wiremock-standalone").versionRef("wiremock")
         }

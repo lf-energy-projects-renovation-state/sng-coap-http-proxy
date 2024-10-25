@@ -23,9 +23,8 @@ dependencies {
 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
-    testImplementation("org.mockito:mockito-junit-jupiter")
-    testImplementation(libs.mockitoKotlin)
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation(libs.mockk)
 
     // Generate test and integration test reports
     jacocoAggregation(project(":application"))

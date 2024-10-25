@@ -5,6 +5,11 @@ package org.gxf.standalonenotifyinggateway.coaphttpproxy
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.cbor.databind.CBORMapper
+import io.mockk.every
+import io.mockk.impl.annotations.InjectMockKs
+import io.mockk.impl.annotations.MockK
+import io.mockk.junit5.MockKExtension
+import io.mockk.verify
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.catchThrowable
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.coap.MessageHandler
@@ -15,34 +20,27 @@ import org.gxf.standalonenotifyinggateway.coaphttpproxy.http.HttpClient
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.logging.RemoteLogger
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.InjectMocks
-import org.mockito.Mock
-import org.mockito.Mockito.verify
-import org.mockito.Mockito.`when`
-import org.mockito.junit.jupiter.MockitoExtension
-import org.mockito.kotlin.any
-import org.mockito.kotlin.check
+import org.springframework.http.ResponseEntity
 
-@ExtendWith(MockitoExtension::class)
+@ExtendWith(MockKExtension::class)
 class MessageHandlerTest {
-    @Mock private lateinit var httpClient: HttpClient
+    @MockK private lateinit var httpClient: HttpClient
+    @MockK private lateinit var messageValidator: MessageValidator
+    @MockK(relaxed = true) private lateinit var remoteLogger: RemoteLogger
 
-    @Mock private lateinit var messageValidator: MessageValidator
-
-    @Mock private lateinit var remoteLogger: RemoteLogger
-
-    @InjectMocks private lateinit var messageHandler: MessageHandler
+    @InjectMockKs private lateinit var messageHandler: MessageHandler
 
     private val testJsonNode = ObjectMapper().readTree("{\"ID\": 12345}")
     private val testCbor = CBORMapper().writeValueAsBytes(testJsonNode)
 
     @Test
     fun shouldCallRemoteLoggerWhenMessageIsInvalid() {
-        `when`(messageValidator.isValid(any<Message>())).thenReturn(false)
+        every { messageValidator.isValid(any()) } returns false
 
         val thrownException = catchThrowable {
             messageHandler.handlePost("12345", testCbor)
-            verify(remoteLogger).error(any())
+
+            verify { remoteLogger.error(any()) }
         }
 
         assertThat(thrownException).isInstanceOf(InvalidMessageException::class.java)
@@ -50,12 +48,11 @@ class MessageHandlerTest {
 
     @Test
     fun callHttpClientWhenMessageIsValid() {
-        val message = Message("12345", testJsonNode)
-
-        `when`(messageValidator.isValid(any<Message>())).thenReturn(true)
+        every { messageValidator.isValid(any()) } returns true
+        every { httpClient.postMessage(any()) } returns ResponseEntity.ok("OK")
 
         messageHandler.handlePost("12345", testCbor)
 
-        verify(httpClient).postMessage(check { assertThat(it).usingRecursiveComparison().isEqualTo(message) })
+        verify { httpClient.postMessage(Message("12345", testJsonNode)) }
     }
 }
