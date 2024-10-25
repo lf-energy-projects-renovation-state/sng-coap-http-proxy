@@ -76,5 +76,6 @@ class CoapConfiguration(private val coapProps: CoapProperties, private val udpPr
                 .setAddress(InetSocketAddress(coapProps.coapsPort))
                 .setAdvancedPskStore(remotePskStore)
                 .setConnectionListener(MdcConnectionListener())
-                .build())
+                .build()
+        )
 }
