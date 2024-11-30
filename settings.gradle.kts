@@ -13,7 +13,7 @@ dependencyResolutionManagement {
             version("mockk", "1.13.13")
             version("commonsCodec", "1.17.1")
             version("californium", "3.8.0")
-            version("wiremock", "3.6.0")
+            version("wiremock", "3.10.0")
 
             library("californiumCore", "org.eclipse.californium", "californium-core").versionRef("californium")
             library("californiumScandium", "org.eclipse.californium", "scandium").versionRef("californium")
