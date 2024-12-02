@@ -9,7 +9,7 @@ include("application")
 dependencyResolutionManagement {
     versionCatalogs {
         create("libs") {
-            version("kotlinLogging", "7.0.0")
+            version("kotlinLogging", "7.0.3")
             version("mockk", "1.13.13")
             version("commonsCodec", "1.17.1")
             version("californium", "3.8.0")
