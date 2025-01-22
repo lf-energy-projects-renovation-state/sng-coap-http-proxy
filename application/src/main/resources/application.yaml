@@ -17,6 +17,7 @@ spring:
 config:
   http:
     ssl-bundle: "coap-http-proxy"
+    connection-check: true
   coap:
     cipher-suites: TLS_PSK_WITH_AES_128_GCM_SHA256
 
