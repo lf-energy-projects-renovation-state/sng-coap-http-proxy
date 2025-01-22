@@ -7,23 +7,23 @@ import org.springframework.boot.gradle.tasks.bundling.BootJar
 plugins { id("org.springframework.boot") }
 
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-actuator")
-    implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("org.springframework.boot:spring-boot-starter-webflux")
+    implementation(libs.springBootStarterActuator)
+    implementation(libs.springBootStarterWeb)
+    implementation(libs.springBootStarterWebflux)
 
     implementation(libs.kotlinLoggingJvm)
-    implementation(kotlin("reflect"))
+    implementation(libs.reflect)
 
     implementation(libs.californiumCore)
     implementation(libs.californiumScandium)
-    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-cbor")
+    implementation(libs.jacksonDataformatCbor)
     implementation(libs.commonsCodec)
 
-    runtimeOnly("io.micrometer:micrometer-registry-prometheus")
+    runtimeOnly(libs.micrometerPrometheusModule)
 
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testRuntimeOnly(libs.junitPlatformLauncher)
 
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation(libs.springBootStarterTest)
     testImplementation(libs.mockk)
 
     // Generate test and integration test reports
@@ -56,10 +56,10 @@ testing {
                 dependencies {
                     implementation(project())
                     implementation(libs.wiremock)
-                    implementation("org.springframework.boot:spring-boot-starter-test")
+                    implementation(libs.springBootStarterTest)
                     implementation(libs.californiumCore)
                     implementation(libs.californiumScandium)
-                    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-cbor")
+                    implementation(libs.jacksonDataformatCbor)
                     implementation(libs.kotlinLoggingJvm)
                 }
             }
