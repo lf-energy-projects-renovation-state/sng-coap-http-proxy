@@ -17,5 +17,5 @@ class CoapProperties(
     val maxPeerInactivityPeriod: Duration,
     val maxResourceBodySize: Int,
     val preferredBlockSize: Int,
-    val cipherSuites: List<CipherSuite>
+    val cipherSuites: List<CipherSuite>,
 )

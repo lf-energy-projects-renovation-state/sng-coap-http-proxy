@@ -44,8 +44,6 @@ class HttpClient(private val webClient: RestClient) {
         body["URC"].filter { it.isTextual }.map { it.asText() }.firstOrNull()
 
     @Throws(HttpClientErrorException::class, HttpServerErrorException::class)
-    private fun executeRequest(
-        id: String,
-        body: String,
-    ): ResponseEntity<String> = webClient.post().uri("$MESSAGE_PATH/$id").body(body).retrieve().toEntity<String>()
+    private fun executeRequest(id: String, body: String): ResponseEntity<String> =
+        webClient.post().uri("$MESSAGE_PATH/$id").body(body).retrieve().toEntity<String>()
 }

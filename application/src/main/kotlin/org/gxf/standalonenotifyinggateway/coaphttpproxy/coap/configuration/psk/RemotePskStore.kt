@@ -36,10 +36,7 @@ class RemotePskStore(private val webClient: RestClient, private val remoteLogger
         return PskSecretResult(cid, identity, getSecretForIdentity(identity.publicInfoAsString))
     }
 
-    override fun getIdentity(
-        peerAddress: InetSocketAddress,
-        virtualHost: ServerNames?,
-    ): PskPublicInformation? {
+    override fun getIdentity(peerAddress: InetSocketAddress, virtualHost: ServerNames?): PskPublicInformation? {
         throw NotImplementedError("Method not implemented because it is not used")
     }
 

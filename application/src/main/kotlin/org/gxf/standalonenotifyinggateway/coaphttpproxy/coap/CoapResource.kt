@@ -39,7 +39,7 @@ class CoapResource(
             }
             val response = messageHandler.handlePost(deviceId, coapExchange.requestPayload)
             // Intentional exception throwing when the response is null or when there is no body
-            writeResponse(coapExchange, response?.body!!, deviceId)
+            writeResponse(coapExchange, response.body!!, deviceId)
         } catch (e: Exception) {
             logger.warn { "Error occurred while handling post to device service for device $deviceId" }
             when (e) {
@@ -60,11 +60,7 @@ class CoapResource(
         }
     }
 
-    private fun writeResponse(
-        coapExchange: CoapExchange,
-        body: String,
-        deviceId: String,
-    ) {
+    private fun writeResponse(coapExchange: CoapExchange, body: String, deviceId: String) {
         logger.info { "Sending successful response for device $deviceId" }
         coapExchange.setMaxAge(1)
 
@@ -73,17 +69,11 @@ class CoapResource(
         coapExchange.respond(ResponseCode.CONTENT, body)
     }
 
-    private fun handleError(
-        coapExchange: CoapExchange,
-        responseCode: ResponseCode,
-    ) {
+    private fun handleError(coapExchange: CoapExchange, responseCode: ResponseCode) {
         coapExchange.respond(responseCode)
     }
 
-    private fun handleUnexpectedError(
-        coapExchange: CoapExchange,
-        e: Exception,
-    ) {
+    private fun handleUnexpectedError(coapExchange: CoapExchange, e: Exception) {
         remoteLogger.error(e) { "Unexpected error occurred" }
         coapExchange.respond(ResponseCode.BAD_GATEWAY)
     }

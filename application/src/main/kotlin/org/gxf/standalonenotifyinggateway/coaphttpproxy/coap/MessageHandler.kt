@@ -25,10 +25,7 @@ class MessageHandler(
     private val cborMapper = CBORMapper()
 
     @Throws(HttpClientErrorException::class, HttpServerErrorException::class)
-    fun handlePost(
-        id: String,
-        payload: ByteArray,
-    ): ResponseEntity<String> {
+    fun handlePost(id: String, payload: ByteArray): ResponseEntity<String> {
         val parsedJson = cborMapper.readTree(payload)
         val message = Message(id, parsedJson)
 

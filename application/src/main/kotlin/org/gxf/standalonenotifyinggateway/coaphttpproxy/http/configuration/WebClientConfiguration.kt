@@ -16,10 +16,7 @@ import org.springframework.web.client.RestClient
 class WebClientConfiguration(private val httpProps: HttpProperties) {
 
     @Bean
-    fun webClient(
-        webClientBuilder: RestClient.Builder,
-        webClientSsl: RestClientSsl,
-    ): RestClient =
+    fun webClient(webClientBuilder: RestClient.Builder, webClientSsl: RestClientSsl): RestClient =
         webClientBuilder
             .requestFactory(requestFactory())
             .baseUrl(httpProps.url)
