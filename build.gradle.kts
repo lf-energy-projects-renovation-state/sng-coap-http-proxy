@@ -29,6 +29,16 @@ sonar {
     }
 }
 
+allprojects {
+    apply(plugin = rootProject.libs.plugins.spotless.get().pluginId)
+
+    repositories { mavenCentral() }
+
+    extensions.configure<SpotlessExtension> {
+        kotlinGradle { ktfmt().kotlinlangStyle().configure { it.setMaxWidth(120) } }
+    }
+}
+
 subprojects {
     apply(plugin = rootProject.libs.plugins.kotlin.get().pluginId)
     apply(plugin = rootProject.libs.plugins.spring.get().pluginId)
@@ -46,26 +56,15 @@ subprojects {
 
     extensions.configure<SpotlessExtension> {
         kotlin {
-            ktfmt().kotlinlangStyle().configure {
-                it.setMaxWidth(120)
-            }
+            ktfmt().kotlinlangStyle().configure { it.setMaxWidth(120) }
 
             licenseHeaderFile("${project.rootDir}/license-template.kt", "package").updateYearWithLatest(false)
-        }
-        kotlinGradle {
-            ktfmt().kotlinlangStyle().configure {
-                it.setMaxWidth(120)
-            }
         }
     }
 
     extensions.configure<KotlinJvmProjectExtension> {
-        jvmToolchain {
-            languageVersion = JavaLanguageVersion.of(21)
-        }
-        compilerOptions {
-            freeCompilerArgs = listOf("-Xjsr305=strict")
-        }
+        jvmToolchain { languageVersion = JavaLanguageVersion.of(21) }
+        compilerOptions { freeCompilerArgs = listOf("-Xjsr305=strict") }
     }
     extensions.configure<StandardDependencyManagementExtension> {
         imports { mavenBom(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES) }
@@ -80,9 +79,5 @@ subprojects {
         into("${project.rootDir}/.git/hooks")
     }
 
-    tasks.withType<KotlinCompile> {
-        dependsOn(
-            tasks.named("updateGitHooks")
-        )
-    }
+    tasks.withType<KotlinCompile> { dependsOn(tasks.named("updateGitHooks")) }
 }
