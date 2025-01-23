@@ -11,5 +11,5 @@ data class HttpProperties(
     val url: String,
     val sslBundle: String?,
     val connectionTimeout: Duration,
-    val connectionCheck: Boolean = true
+    val connectionCheck: Boolean = true,
 )

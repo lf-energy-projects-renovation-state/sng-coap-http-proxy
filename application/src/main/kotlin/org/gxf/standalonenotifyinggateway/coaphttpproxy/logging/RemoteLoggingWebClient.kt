@@ -11,10 +11,7 @@ import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
 
 @Component
-class RemoteLoggingWebClient(
-    private val webClient: RestClient,
-    private val httpProperties: HttpProperties,
-) {
+class RemoteLoggingWebClient(private val webClient: RestClient, private val httpProperties: HttpProperties) {
     private val logger = KotlinLogging.logger {}
 
     /**
