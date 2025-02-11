@@ -9,6 +9,7 @@ import org.gxf.standalonenotifyinggateway.coaphttpproxy.http.HttpClient
 import org.gxf.standalonenotifyinggateway.coaphttpproxy.http.configuration.properties.HttpProperties
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
+import org.springframework.web.client.toEntity
 
 @Component
 class RemoteLoggingWebClient(private val webClient: RestClient, private val httpProperties: HttpProperties) {
@@ -42,6 +43,6 @@ class RemoteLoggingWebClient(private val webClient: RestClient, private val http
     }
 
     private fun executeErrorRequest(body: String) {
-        webClient.post().uri(HttpClient.ERROR_PATH).body(body).retrieve()
+        webClient.post().uri(HttpClient.ERROR_PATH).body(body).retrieve().toEntity<String>()
     }
 }
