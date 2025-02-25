@@ -7,6 +7,7 @@ avro-plugin = "1.9.1"
 californium = "3.13.0"
 commonsCodec = "1.18.0"
 dependency-management = "1.1.7"
+gradleWrapperUpgrade = "0.12"
 gxf-utils = "2.1.2"
 kotlin = "2.1.10"
 kotlin-logging = "7.0.4"
@@ -57,6 +58,7 @@ gxfUtils = ["kafkaAvro", "kafkaAzureOAuth"]
 avro = { id = "com.github.davidmc24.gradle.plugin.avro", version.ref = "avro-plugin" }
 dependencyManagement = { id = "io.spring.dependency-management", version.ref = "dependency-management" }
 eclipse = { id = "eclipse" }
+gradleWrapperUpgrade = { id = "org.gradle.wrapper-upgrade", version.ref = "gradleWrapperUpgrade" }
 jacoco = { id = "jacoco" }
 jacocoReportAggregation = { id = "jacoco-report-aggregation" }
 jpa = { id = "org.jetbrains.kotlin.plugin.jpa", version.ref = "kotlin" }
