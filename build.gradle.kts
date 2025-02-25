@@ -17,9 +17,19 @@ plugins {
     alias(libs.plugins.sonarqube)
     alias(libs.plugins.spotless)
     alias(libs.plugins.eclipse)
+    alias(libs.plugins.gradleWrapperUpgrade)
 }
 
 version = System.getenv("GITHUB_REF_NAME")?.replace("/", "-")?.lowercase() ?: "develop"
+
+wrapperUpgrade {
+    gradle {
+        register("sng-coap-http-proxy") {
+            repo.set("OSGP/sng-coap-http-proxy")
+            baseBranch.set("main")
+        }
+    }
+}
 
 sonar {
     properties {
