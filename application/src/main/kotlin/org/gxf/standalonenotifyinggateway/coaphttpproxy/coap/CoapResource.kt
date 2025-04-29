@@ -43,10 +43,10 @@ class CoapResource(
         } catch (e: Exception) {
             logger.warn { "Error occurred while handling post to device service for device $deviceId" }
             when (e) {
-                is HttpClientErrorException -> handleError(coapExchange, ResponseCode.BAD_REQUEST)
-                is HttpServerErrorException -> handleError(coapExchange, ResponseCode.INTERNAL_SERVER_ERROR)
-                is InvalidMessageException -> handleInvalidMessage(coapExchange)
-                else -> handleUnexpectedError(coapExchange, e)
+                is HttpClientErrorException -> handleError(coapExchange, ResponseCode.BAD_REQUEST, deviceId)
+                is HttpServerErrorException -> handleError(coapExchange, ResponseCode.INTERNAL_SERVER_ERROR, deviceId)
+                is InvalidMessageException -> handleInvalidMessage(coapExchange, deviceId)
+                else -> handleUnexpectedError(coapExchange, e, deviceId)
             }
         }
     }
@@ -69,16 +69,21 @@ class CoapResource(
         coapExchange.respond(ResponseCode.CONTENT, body)
     }
 
-    private fun handleError(coapExchange: CoapExchange, responseCode: ResponseCode) {
+    private fun handleError(coapExchange: CoapExchange, responseCode: ResponseCode, deviceId: String?) {
+        remoteLogger.error { "Sending ${responseCode.name} as response to device $deviceId" }
         coapExchange.respond(responseCode)
     }
 
-    private fun handleUnexpectedError(coapExchange: CoapExchange, e: Exception) {
-        remoteLogger.error(e) { "Unexpected error occurred" }
+    private fun handleUnexpectedError(coapExchange: CoapExchange, e: Exception, deviceId: String?) {
+        remoteLogger.error(e) { "Unexpected error occurred in handling the CoAP message for device $deviceId" }
         coapExchange.respond(ResponseCode.BAD_GATEWAY)
     }
 
-    private fun handleInvalidMessage(coapExchange: CoapExchange) {
-        coapExchange.respond(ResponseCode.BAD_GATEWAY)
+    private fun handleInvalidMessage(coapExchange: CoapExchange, deviceId: String?) {
+        val responseCode = ResponseCode.BAD_GATEWAY
+        remoteLogger.error {
+            "Sending ${responseCode.name} as response to the device $deviceId because of an invalid message"
+        }
+        coapExchange.respond(responseCode)
     }
 }
