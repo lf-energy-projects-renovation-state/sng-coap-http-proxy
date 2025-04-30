@@ -43,8 +43,9 @@ class CoapResource(
         } catch (e: Exception) {
             logger.warn { "Error occurred while handling post to device service for device $deviceId" }
             when (e) {
-                is HttpClientErrorException -> handleError(coapExchange, ResponseCode.BAD_REQUEST, deviceId)
-                is HttpServerErrorException -> handleError(coapExchange, ResponseCode.INTERNAL_SERVER_ERROR, deviceId)
+                is HttpClientErrorException -> handleError(coapExchange, ResponseCode.BAD_REQUEST, e, deviceId)
+                is HttpServerErrorException ->
+                    handleError(coapExchange, ResponseCode.INTERNAL_SERVER_ERROR, e, deviceId)
                 is InvalidMessageException -> handleInvalidMessage(coapExchange, deviceId)
                 else -> handleUnexpectedError(coapExchange, e, deviceId)
             }
@@ -69,13 +70,18 @@ class CoapResource(
         coapExchange.respond(ResponseCode.CONTENT, body)
     }
 
-    private fun handleError(coapExchange: CoapExchange, responseCode: ResponseCode, deviceId: String?) {
-        remoteLogger.error { "Sending ${responseCode.name} as response to device $deviceId" }
+    private fun handleError(
+        coapExchange: CoapExchange,
+        responseCode: ResponseCode,
+        exception: Exception,
+        deviceId: String?,
+    ) {
+        remoteLogger.error(exception) { "Sending ${responseCode.name} as response to device $deviceId" }
         coapExchange.respond(responseCode)
     }
 
-    private fun handleUnexpectedError(coapExchange: CoapExchange, e: Exception, deviceId: String?) {
-        remoteLogger.error(e) { "Unexpected error occurred in handling the CoAP message for device $deviceId" }
+    private fun handleUnexpectedError(coapExchange: CoapExchange, exception: Exception, deviceId: String?) {
+        remoteLogger.error(exception) { "Unexpected error occurred in handling the CoAP message for device $deviceId" }
         coapExchange.respond(ResponseCode.BAD_GATEWAY)
     }
 
