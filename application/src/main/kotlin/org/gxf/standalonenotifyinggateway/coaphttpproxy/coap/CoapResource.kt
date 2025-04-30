@@ -46,7 +46,7 @@ class CoapResource(
                 is HttpClientErrorException -> handleError(coapExchange, ResponseCode.BAD_REQUEST, e, deviceId)
                 is HttpServerErrorException ->
                     handleError(coapExchange, ResponseCode.INTERNAL_SERVER_ERROR, e, deviceId)
-                is InvalidMessageException -> handleInvalidMessage(coapExchange, deviceId)
+                is InvalidMessageException -> handleInvalidMessage(coapExchange, e, deviceId)
                 else -> handleUnexpectedError(coapExchange, e, deviceId)
             }
         }
@@ -85,9 +85,9 @@ class CoapResource(
         coapExchange.respond(ResponseCode.BAD_GATEWAY)
     }
 
-    private fun handleInvalidMessage(coapExchange: CoapExchange, deviceId: String?) {
+    private fun handleInvalidMessage(coapExchange: CoapExchange, exception: Exception, deviceId: String?) {
         val responseCode = ResponseCode.BAD_GATEWAY
-        remoteLogger.error {
+        remoteLogger.error(exception) {
             "Sending ${responseCode.name} as response to the device $deviceId because of an invalid message"
         }
         coapExchange.respond(responseCode)
