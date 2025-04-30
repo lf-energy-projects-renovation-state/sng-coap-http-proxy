@@ -129,7 +129,7 @@ class IntegrationTest {
             val wiremockRequestsError = wiremock.findAll(postRequestedFor(urlPathTemplate(HttpClient.ERROR_PATH)))
 
             assertThat(wiremockRequestsSng).hasSize(0)
-            assertThat(wiremockRequestsError).hasSize(1)
+            assertThat(wiremockRequestsError).hasSize(2)
             assertThat(response.code).isEqualTo(CoAP.ResponseCode.BAD_GATEWAY)
         }
     }

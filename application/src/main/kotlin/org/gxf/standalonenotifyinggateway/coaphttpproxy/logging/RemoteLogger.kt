@@ -18,7 +18,7 @@ class RemoteLogger(private val remoteLoggingWebClient: RemoteLoggingWebClient) {
     fun error(exception: Exception, msg: () -> String) {
         logger.error(exception, msg)
         remoteLoggingWebClient.remoteLogMessage(
-            "Unknown error occurred with $msg, exception message: ${exception.message} and stacktrace: ${exception.stackTrace}"
+            "$msg - exception message: ${exception.message}. See DMZ log for stacktrace."
         )
     }
 }
