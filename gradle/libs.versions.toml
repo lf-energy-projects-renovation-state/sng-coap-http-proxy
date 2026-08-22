@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 [versions]
-avro = "1.12.0"
+avro = "1.12.2"
 avro-plugin = "1.9.1"
 californium = "3.14.0"
 commonsCodec = "1.19.0"
