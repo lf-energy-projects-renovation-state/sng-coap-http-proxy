@@ -15,7 +15,7 @@ mockk = "1.14.5"
 springmockk = "4.0.2"
 sonarqube = "6.3.1.5724"
 spotless = "7.2.1"
-spring-boot = "3.5.5"
+spring-boot = "4.1.1"
 wiremock = "3.13.1"
 
 [libraries]
